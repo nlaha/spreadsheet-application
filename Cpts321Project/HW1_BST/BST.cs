@@ -12,6 +12,7 @@ namespace HW1_BST
 
         public int Count { get; private set; }
         public int Height { get => TreeHeightRecursive(_root); }
+        public int MinHeight { get => (int)Math.Ceiling(Math.Log2(Count + 1));  }
 
         public BST()
         {

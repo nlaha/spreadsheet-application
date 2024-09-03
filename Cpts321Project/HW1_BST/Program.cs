@@ -36,6 +36,7 @@
 
             Console.WriteLine($"Height {bst.Height}");
             Console.WriteLine($"Count {bst.Count}");
+            Console.WriteLine($"Min Height {bst.MinHeight}");
         }
     }
 }
