@@ -10,6 +10,9 @@ namespace HW1_BST
     {
         private BSTNode<T>? _root;
 
+        public int Count { get; private set; }
+        public int Height { get => TreeHeightRecursive(_root); }
+
         public BST()
         {
             _root = null;
@@ -22,14 +25,16 @@ namespace HW1_BST
         /// <returns>true if insertion was succesful</returns>
         public bool Add(T item)
         {
-            BSTNode<T>? current = _root;
-
-            if (current == null)
+            if (_root == null)
             {
-                current = new BSTNode<T>(item);
+                _root = new BSTNode<T>(item);
+                Count++;
+                return true;
             }
             else
             {
+                BSTNode<T>? current = _root;
+
                 while (current != null)
                 {
                     if (current.Value.Equals(item))
@@ -39,19 +44,35 @@ namespace HW1_BST
                     }
 
                     // insert in sorted order
-                    if (current.Value.CompareTo(item) < 0)
+                    if (current.Value.CompareTo(item) > 0)
                     {
-                        current = current.Left;
+                        if (current.Left == null)
+                        {
+                            current.Left = new BSTNode<T>(item);
+                            Count++;
+                            return true;
+                        }
+                        else
+                        {
+                            current = current.Left;
+                        }
                     } else
                     {
-                        current = current.Right;
+                        if (current.Right == null)
+                        {
+                            current.Right = new BSTNode<T>(item);
+                            Count++;
+                            return true;
+                        }
+                        else
+                        {
+                            current = current.Right;
+                        }
                     }
                 }
 
-                current = new BSTNode<T>(item);
+                return false;
             }
-
-            return true;
         }
 
         /// <summary>
@@ -60,7 +81,22 @@ namespace HW1_BST
         public void Print()
         {
             Action<T> printAction = v => Console.Write($"{v}, ");
-            Traverse(_root, printAction);
+            InOrderTraversal(_root, printAction);
+            Console.Write("\n");
+        }
+
+        /// <summary>
+        /// Internal function for finding the number of levels in the tree
+        /// </summary>
+        /// <param name="node"></param>
+        private int TreeHeightRecursive(BSTNode<T>? node)
+        {
+            if (node == null)
+                return 0;
+
+            var hLeft = TreeHeightRecursive(node.Left);
+            var hRight = TreeHeightRecursive(node.Right);
+            return Math.Max(hLeft, hRight) + 1;
         }
 
         /// <summary>
@@ -68,7 +104,7 @@ namespace HW1_BST
         /// </summary>
         /// <param name="node">the node to start with (usually the root)</param>
         /// <param name="processFunc">an action delegate that is called on the value of each node traversed</param>
-        private void Traverse(BSTNode<T>? node, Action<T> processFunc)
+        private void InOrderTraversal(BSTNode<T>? node, Action<T> processFunc)
         {
             if (node == null)
             {
@@ -76,11 +112,11 @@ namespace HW1_BST
             }
 
             // in order traversal
-            Traverse(node.Left, processFunc);
+            InOrderTraversal(node.Left, processFunc);
 
             processFunc(node.Value);
 
-            Traverse(node.Right, processFunc);
+            InOrderTraversal(node.Right, processFunc);
         }
     }
 }
