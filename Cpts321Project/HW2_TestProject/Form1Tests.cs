@@ -4,11 +4,9 @@ namespace HW2_TestProject
 {
     public class Tests
     {
-        [SetUp]
-        public void Setup()
-        {
-        }
-
+        /// <summary>
+        /// Test for FillListRandomIntegers
+        /// </summary>
         [Test]
         public void TestFillListRandomIntegersReturnsFilledArray()
         {
@@ -23,6 +21,9 @@ namespace HW2_TestProject
             Assert.That(result.Min(), Is.GreaterThanOrEqualTo(0));
         }
 
+        /// <summary>
+        /// Test for UniqueIntegersOne
+        /// </summary>
         [Test]
         public void TestUniqueIntegersOneReturnsNumUniqueIntegers()
         {
@@ -36,6 +37,9 @@ namespace HW2_TestProject
             Assert.That(numUnique, Is.EqualTo(random.Distinct().Count()));
         }
 
+        /// <summary>
+        /// Test for UniqueIntegersOne
+        /// </summary>
         [Test]
         public void TestUniqueIntegersOneReturnsZeroForEmptyList()
         {
@@ -49,6 +53,9 @@ namespace HW2_TestProject
             Assert.That(numUnique, Is.EqualTo(0));
         }
 
+        /// <summary>
+        /// Test for UniqueIntegersTwo
+        /// </summary>
         [Test]
         public void TestUniqueIntegersTwoReturnsNumUniqueIntegers()
         {
@@ -62,6 +69,9 @@ namespace HW2_TestProject
             Assert.That(numUnique, Is.EqualTo(random.Distinct().Count()));
         }
 
+        /// <summary>
+        /// Test for UniqueIntegersTwo
+        /// </summary>
         [Test]
         public void TestUniqueIntegersTwoReturnsZeroForEmptyList()
         {
@@ -75,6 +85,9 @@ namespace HW2_TestProject
             Assert.That(numUnique, Is.EqualTo(0));
         }
 
+        /// <summary>
+        /// Test for UniqueIntegersThree
+        /// </summary>
         [Test]
         public void TestUniqueIntegersThreeReturnsNumUniqueIntegers()
         {
@@ -88,6 +101,9 @@ namespace HW2_TestProject
             Assert.That(numUnique, Is.EqualTo(random.Distinct().Count()));
         }
 
+        /// <summary>
+        /// Test for UniqueIntegersThree
+        /// </summary>
         [Test]
         public void TestUniqueIntegersThreeReturnsZeroForEmptyList()
         {
