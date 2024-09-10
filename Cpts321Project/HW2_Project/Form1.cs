@@ -15,9 +15,20 @@ namespace HW2_Project
 
         }
 
-        public static List<int> FillListRandomIntegers(List<int> list)
+        /// <summary>
+        /// Returns a list containing 10,000 random integers from 0 to 20000
+        /// </summary>
+        /// <returns></returns>
+        public static List<int> FillListRandomIntegers()
         {
-            throw new NotImplementedException();
+            List<int> list = new List<int>(10000);
+            Random rand = new Random();
+            for (int i = 0; i < 10000; i++)
+            {
+                list.Add(rand.Next() % 20000);
+            }
+
+            return list;
         }
     }
 }
