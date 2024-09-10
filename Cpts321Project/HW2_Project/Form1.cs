@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text;
 
 namespace HW2_Project
 {
@@ -10,22 +11,53 @@ namespace HW2_Project
             RunDistinctIntegers();
         }
 
-        private static void RunDistinctIntegers()
+        private void RunDistinctIntegers()
         {
+            List<int> random = FillListRandomIntegers();
 
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"HashSet method: {UniqueIntegersOne(random)} unique numbers, the time complexity of this method is O(n) because we could have a list entirely made of unique numbers.");
+            sb.AppendLine($"O(1) storage method: {UniqueIntegersTwo(random)} unique numbers");
+            sb.AppendLine($"Sorted method: {UniqueIntegersThree(random)} unique numbers");
+
+            textBox1.Text = sb.ToString();
         }
 
+        /// <summary>
+        /// Returns the number of unique integers in a list
+        /// using a hash set
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
         public static int UniqueIntegersOne(List<int> list)
         {
-            throw new NotImplementedException();
+            HashSet<int> set = new HashSet<int>();
+            list.ForEach((x) => set.Add(x));
+
+            return set.Count;
         }
+
+        /// <summary>
+        /// Returns the number of unique integers in a list
+        /// using an O(1) storage complexity
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
         public static int UniqueIntegersTwo(List<int> list)
         {
-            throw new NotImplementedException();
+            return 0;
         }
+
+        /// <summary>
+        /// Returns the number of unique integers in a list using sorting
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
         public static int UniqueIntegersThree(List<int> list)
         {
-            throw new NotImplementedException();
+            return 0;
         }
 
         /// <summary>
