@@ -15,6 +15,19 @@ namespace HW2_Project
 
         }
 
+        public static int UniqueIntegersOne(List<int> list)
+        {
+            throw new NotImplementedException();
+        }
+        public static int UniqueIntegersTwo(List<int> list)
+        {
+            throw new NotImplementedException();
+        }
+        public static int UniqueIntegersThree(List<int> list)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Returns a list containing 10,000 random integers from 0 to 20000
         /// </summary>
