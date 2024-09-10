@@ -11,6 +11,9 @@ namespace HW2_Project
             RunDistinctIntegers();
         }
 
+        /// <summary>
+        /// Entry method for distinct integer calculation
+        /// </summary>
         private void RunDistinctIntegers()
         {
             List<int> random = FillListRandomIntegers();
