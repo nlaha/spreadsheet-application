@@ -16,7 +16,11 @@ namespace HW2_Project
             List<int> random = FillListRandomIntegers();
 
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine($"HashSet method: {UniqueIntegersOne(random)} unique numbers, the time complexity of this method is O(n) because we could have a list entirely made of unique numbers.");
+            sb.AppendLine($"HashSet method: {UniqueIntegersOne(random)} unique numbers");
+            sb.AppendLine("""
+                The time complexity of this method is O(n) because we could have a list entirely made of unique numbers. 
+                This means we would need to add the entire list to the hash set, and each add operation is O(1).
+                """);
             sb.AppendLine($"O(1) storage method: {UniqueIntegersTwo(random)} unique numbers");
             sb.AppendLine($"Sorted method: {UniqueIntegersThree(random)} unique numbers");
 
