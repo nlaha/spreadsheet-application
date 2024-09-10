@@ -66,7 +66,21 @@ namespace HW2_Project
         /// <exception cref="NotImplementedException"></exception>
         public static int UniqueIntegersThree(List<int> list)
         {
-            return 0;
+            list.Sort();
+
+            int unique = 0;
+            int previous = -1;
+            foreach (var x in list)
+            {
+                if (!previous.Equals(x))
+                {
+                    unique++;
+                }
+
+                previous = x;
+            }
+
+            return unique;
         }
 
         /// <summary>
