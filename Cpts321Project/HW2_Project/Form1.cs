@@ -46,7 +46,16 @@ namespace HW2_Project
         /// <exception cref="NotImplementedException"></exception>
         public static int UniqueIntegersTwo(List<int> list)
         {
-            return 0;
+            int unique = 0;
+            for (int i = 0; i < 20000; i++)
+            {
+                if (list.Contains(i))
+                {
+                    unique++;
+                }
+            }
+
+            return unique;
         }
 
         /// <summary>
