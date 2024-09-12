@@ -4,6 +4,8 @@
 | ----------- | -------- | ------------------- |
 | Nathan Laha            | 11762135         | nathan.laha@wsu.edu    
 
+## StyleCop Changes
+
 Disabled "fields should not begin with underscore"
 - I prefer naming my private fields starting with "_" as it makes assigning them in constructors easier (I can have the same name without an underscore for the parameters)
 
