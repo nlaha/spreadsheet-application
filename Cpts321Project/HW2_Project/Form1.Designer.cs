@@ -1,4 +1,8 @@
-﻿namespace HW2_Project
+﻿// <copyright file="Form1.Designer.cs" company="Nathan Laha">
+// 11762135
+// </copyright>
+
+namespace HW2_Project
 {
     partial class Form1
     {

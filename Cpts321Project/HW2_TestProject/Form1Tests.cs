@@ -1,11 +1,18 @@
-using HW2_Project;
+// <copyright file="Form1Tests.cs" company="Nathan Laha">
+// 11762135
+// </copyright>
 
 namespace HW2_TestProject
 {
-    public class Tests
+    using HW2_Project;
+
+    /// <summary>
+    /// Tests for the Form1Tests.
+    /// </summary>
+    public class Form1Tests
     {
         /// <summary>
-        /// Test for FillListRandomIntegers
+        /// Test for FillListRandomIntegers.
         /// </summary>
         [Test]
         public void TestFillListRandomIntegersReturnsFilledArray()
@@ -22,7 +29,7 @@ namespace HW2_TestProject
         }
 
         /// <summary>
-        /// Test for UniqueIntegersOne
+        /// Test for UniqueIntegersOne.
         /// </summary>
         [Test]
         public void TestUniqueIntegersOneReturnsNumUniqueIntegers()
@@ -38,7 +45,7 @@ namespace HW2_TestProject
         }
 
         /// <summary>
-        /// Test for UniqueIntegersOne
+        /// Test for UniqueIntegersOne.
         /// </summary>
         [Test]
         public void TestUniqueIntegersOneReturnsZeroForEmptyList()
@@ -54,7 +61,7 @@ namespace HW2_TestProject
         }
 
         /// <summary>
-        /// Test for UniqueIntegersTwo
+        /// Test for UniqueIntegersTwo.
         /// </summary>
         [Test]
         public void TestUniqueIntegersTwoReturnsNumUniqueIntegers()
@@ -70,7 +77,7 @@ namespace HW2_TestProject
         }
 
         /// <summary>
-        /// Test for UniqueIntegersTwo
+        /// Test for UniqueIntegersTwo.
         /// </summary>
         [Test]
         public void TestUniqueIntegersTwoReturnsZeroForEmptyList()
@@ -86,7 +93,7 @@ namespace HW2_TestProject
         }
 
         /// <summary>
-        /// Test for UniqueIntegersThree
+        /// Test for UniqueIntegersThree.
         /// </summary>
         [Test]
         public void TestUniqueIntegersThreeReturnsNumUniqueIntegers()
@@ -102,7 +109,7 @@ namespace HW2_TestProject
         }
 
         /// <summary>
-        /// Test for UniqueIntegersThree
+        /// Test for UniqueIntegersThree.
         /// </summary>
         [Test]
         public void TestUniqueIntegersThreeReturnsZeroForEmptyList()
