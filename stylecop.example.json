@@ -1,0 +1,11 @@
+{
+  "$schema": "https://raw.githubusercontent.com/DotNetAnalyzers/StyleCopAnalyzers/master/StyleCop.Analyzers/StyleCop.Analyzers/Settings/stylecop.schema.json",
+  "settings": {
+    "documentationRules": {
+      "companyName": "Nathan Laha",
+      "copyrightText": "11762135",
+      "documentPrivateElements": true,
+      "documentPrivateFields": true
+    }
+  }
+}
