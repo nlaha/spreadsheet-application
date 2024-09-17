@@ -1,6 +1,11 @@
-﻿namespace Homework3
+﻿// <copyright file="FibonacciTextReader.cs" company="Nathan Laha">
+// 11762135
+// </copyright>
+
+namespace Homework3
 {
     using System.Numerics;
+    using System.Text;
 
     /// <summary>
     /// Custom <see cref="TextReader"/> for generating fibonacci numbers
@@ -9,6 +14,8 @@
     {
         private int _index = 0;
         private int _maxLines = 0;
+        private BigInteger _previous = BigInteger.Zero;
+        private BigInteger _previousPrevious = BigInteger.Zero;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FibonacciTextReader"/> class.
@@ -34,50 +41,46 @@
                 return null;
             }
 
-
             // generate
             BigInteger output = BigInteger.Zero;
-            BigInteger previous = BigInteger.Zero;
-            BigInteger previousPrevious = BigInteger.Zero;
 
             if (this._index == 0)
             {
                 output = BigInteger.Zero;
-                previous = BigInteger.Zero;
-                previousPrevious = BigInteger.Zero;
             }
             else if (this._index == 1)
             {
                 output = BigInteger.One;
-                previous = BigInteger.Zero;
-                previousPrevious = BigInteger.Zero;
-            } else
+                this._previous = BigInteger.One;
+            }
+            else
             {
                 // compute fibonacci number from previous
                 // and previous previous numbers sum
-                output = previous + previousPrevious;
-                previousPrevious = previous;
-                previous = output;
+                output = this._previous + this._previousPrevious;
+                this._previousPrevious = this._previous;
+                this._previous = output;
             }
 
             // increment index
             this._index++;
 
-            return $"{this._index + 1}: {output}";
+            return $"{this._index}: {output.ToString()}";
         }
 
         /// <inheritdoc/>
         public override string ReadToEnd()
         {
-            string outString = string.Empty;
+            var outSb = new StringBuilder();
             string? line = null;
             do
             {
                 line = this.ReadLine();
-                outString = outString + line;
-            } while (line != null);
+                outSb.AppendLine(line);
+            }
+            while (line != null);
 
-            return outString;
+            return outSb.ToString();
         }
     }
 }

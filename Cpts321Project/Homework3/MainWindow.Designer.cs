@@ -82,12 +82,14 @@
             generate50FibonacciNumbersToolStripMenuItem.Name = "generate50FibonacciNumbersToolStripMenuItem";
             generate50FibonacciNumbersToolStripMenuItem.Size = new Size(248, 22);
             generate50FibonacciNumbersToolStripMenuItem.Text = "Generate 50 Fibonacci Numbers";
+            generate50FibonacciNumbersToolStripMenuItem.Click += Generate50FibonacciNumbersToolStripMenuItem_Click;
             // 
             // generate100FibonacciNumbersToolStripMenuItem
             // 
             generate100FibonacciNumbersToolStripMenuItem.Name = "generate100FibonacciNumbersToolStripMenuItem";
             generate100FibonacciNumbersToolStripMenuItem.Size = new Size(248, 22);
             generate100FibonacciNumbersToolStripMenuItem.Text = "Generate 100 Fibonacci Numbers";
+            generate100FibonacciNumbersToolStripMenuItem.Click += Generate100FibonacciNumbersToolStripMenuItem_Click;
             // 
             // mainTextBox
             // 

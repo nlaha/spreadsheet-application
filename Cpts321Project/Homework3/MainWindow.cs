@@ -40,7 +40,6 @@ namespace Homework3
         /// <param name="e">event arguments</param>
         private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
             var result = this.openFileDialog.ShowDialog(this);
 
             if (result == DialogResult.OK)
@@ -72,6 +71,26 @@ namespace Homework3
                     this.SaveText(writer);
                 }
             }
+        }
+
+        /// <summary>
+        /// Called when the "Generate 50 Fibonacci Numbers" button is clicked
+        /// </summary>
+        /// <param name="sender">the sender object</param>
+        /// <param name="e">event arguments</param>
+        private void Generate50FibonacciNumbersToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.LoadText(new FibonacciTextReader(50));
+        }
+
+        /// <summary>
+        /// Called when the "Generate 50 Fibonacci Numbers" button is clicked
+        /// </summary>
+        /// <param name="sender">the sender object</param>
+        /// <param name="e">event arguments</param>
+        private void Generate100FibonacciNumbersToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.LoadText(new FibonacciTextReader(100));
         }
     }
 }

@@ -1,3 +1,7 @@
+// <copyright file="Program.cs" company="Nathan Laha">
+// 11762135
+// </copyright>
+
 namespace Homework3
 {
     internal static class Program
@@ -6,7 +10,7 @@ namespace Homework3
         ///  The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main()
+        public static void Main()
         {
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
