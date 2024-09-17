@@ -73,12 +73,16 @@ namespace Homework3
         {
             var outSb = new StringBuilder();
             string? line = null;
-            do
+            while (true)
             {
                 line = this.ReadLine();
+                if (line == null)
+                {
+                    break;
+                }
+
                 outSb.AppendLine(line);
             }
-            while (line != null);
 
             return outSb.ToString();
         }
