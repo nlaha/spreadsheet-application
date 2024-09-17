@@ -14,3 +14,6 @@ Disabled "documentation should end with a period"
 
 Disabled "elements should be documented"
 - Adding documentation to everything just adds clutter to the code. For example, the `Homework3Tests` project contains a class called `TestFibonacciReader`; Adding a documentation comment to that class won't help readability/maintainability. Especially since it's a test class so it probably won't be referenced in code directly. Similarly, for the test methods, Microsoft recommends having descriptive names such as `Add_MaximumSumResult_ThrowsOverflowException`, and these also do not require documentation comments.
+
+Disabled "closing parenthesis should be spaced correctly"
+- This conflicts with another rule

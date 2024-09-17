@@ -4,19 +4,19 @@
 
 namespace Homework3Tests
 {
+    using System.Numerics;
+    using Homework3;
+
     public class TestFibonacciReader
     {
-        [SetUp]
-        public void Setup()
-        {
-        }
-
         [Test]
         public void FibonacciReader_ReturnsFirst50Numbers()
         {
             // Arrange
+            var fibTextReader = new FibonacciTextReader(50);
 
             // Act
+            var result = fibTextReader.ReadToEnd();
 
             // Assert
         }
@@ -25,8 +25,10 @@ namespace Homework3Tests
         public void FibonacciReader_ReturnsFirst100Numbers()
         {
             // Arrange
+            var fibTextReader = new FibonacciTextReader(50);
 
             // Act
+            var result = fibTextReader.ReadToEnd();
 
             // Assert
         }
@@ -34,21 +36,22 @@ namespace Homework3Tests
         [Test]
         public void FibonacciReader_ThrowsOnNegativeInput()
         {
-            // Arrange
-
             // Act
-
             // Assert
+            Assert.Throws<ArgumentOutOfRangeException>(() => new FibonacciTextReader(-22));
         }
 
         [Test]
         public void FibonacciReader_ReturnsEmptyOnZeroInput()
         {
             // Arrange
+            var fibTextReader = new FibonacciTextReader(0);
 
             // Act
+            var result = fibTextReader.ReadToEnd();
 
             // Assert
+            Assert.That(result, Is.Empty);
         }
     }
 }
