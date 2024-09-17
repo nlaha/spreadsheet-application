@@ -3,7 +3,25 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35208.52
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Homework3", "Homework3\Homework3.csproj", "{DD734A11-59C1-4298-BD30-C47A34493378}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Homework3Tests", "Homework3Tests\Homework3Tests.csproj", "{FFBD9167-4923-4454-9610-19279265E945}"
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DD734A11-59C1-4298-BD30-C47A34493378}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD734A11-59C1-4298-BD30-C47A34493378}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD734A11-59C1-4298-BD30-C47A34493378}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD734A11-59C1-4298-BD30-C47A34493378}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FFBD9167-4923-4454-9610-19279265E945}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FFBD9167-4923-4454-9610-19279265E945}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FFBD9167-4923-4454-9610-19279265E945}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FFBD9167-4923-4454-9610-19279265E945}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
