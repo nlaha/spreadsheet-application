@@ -1,3 +1,7 @@
+// <copyright file="TestFibonacciReader.cs" company="Nathan Laha">
+// 11762135
+// </copyright>
+
 namespace Homework3Tests
 {
     public class TestFibonacciReader
@@ -40,7 +44,11 @@ namespace Homework3Tests
         [Test]
         public void FibonacciReader_ReturnsEmptyOnZeroInput()
         {
+            // Arrange
 
+            // Act
+
+            // Assert
         }
     }
 }

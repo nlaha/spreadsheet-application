@@ -5,3 +5,6 @@ dotnet_diagnostic.SA1309.severity = none
 
 # SA1629: Documentation text should end with a period
 dotnet_diagnostic.SA1629.severity = none
+
+# SA1600: Elements should be documented
+dotnet_diagnostic.SA1600.severity = none

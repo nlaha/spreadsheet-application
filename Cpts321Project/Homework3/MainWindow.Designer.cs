@@ -35,7 +35,9 @@
             toolStripSeparator1 = new ToolStripSeparator();
             generate50FibonacciNumbersToolStripMenuItem = new ToolStripMenuItem();
             generate100FibonacciNumbersToolStripMenuItem = new ToolStripMenuItem();
-            textBox1 = new TextBox();
+            mainTextBox = new TextBox();
+            openFileDialog = new OpenFileDialog();
+            saveFileDialog = new SaveFileDialog();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -61,12 +63,14 @@
             openToolStripMenuItem.Name = "openToolStripMenuItem";
             openToolStripMenuItem.Size = new Size(248, 22);
             openToolStripMenuItem.Text = "Open";
+            openToolStripMenuItem.Click += OpenToolStripMenuItem_Click;
             // 
             // saveToolStripMenuItem
             // 
             saveToolStripMenuItem.Name = "saveToolStripMenuItem";
             saveToolStripMenuItem.Size = new Size(248, 22);
             saveToolStripMenuItem.Text = "Save";
+            saveToolStripMenuItem.Click += SaveToolStripMenuItem_Click;
             // 
             // toolStripSeparator1
             // 
@@ -85,15 +89,24 @@
             generate100FibonacciNumbersToolStripMenuItem.Size = new Size(248, 22);
             generate100FibonacciNumbersToolStripMenuItem.Text = "Generate 100 Fibonacci Numbers";
             // 
-            // textBox1
+            // mainTextBox
             // 
-            textBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            textBox1.Location = new Point(0, 27);
-            textBox1.Multiline = true;
-            textBox1.Name = "textBox1";
-            textBox1.ScrollBars = ScrollBars.Vertical;
-            textBox1.Size = new Size(800, 424);
-            textBox1.TabIndex = 1;
+            mainTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            mainTextBox.Location = new Point(0, 24);
+            mainTextBox.Multiline = true;
+            mainTextBox.Name = "mainTextBox";
+            mainTextBox.ScrollBars = ScrollBars.Vertical;
+            mainTextBox.Size = new Size(800, 427);
+            mainTextBox.TabIndex = 1;
+            // 
+            // openFileDialog
+            // 
+            openFileDialog.FileName = "openFileDialog1";
+            openFileDialog.Filter = "Text|*.txt|All|*.*";
+            // 
+            // saveFileDialog
+            // 
+            saveFileDialog.Filter = "Text|*.txt|All|*.*";
             // 
             // MainWindow
             // 
@@ -101,7 +114,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.Control;
             ClientSize = new Size(800, 450);
-            Controls.Add(textBox1);
+            Controls.Add(mainTextBox);
             Controls.Add(menuStrip1);
             MainMenuStrip = menuStrip1;
             Name = "MainWindow";
@@ -121,6 +134,8 @@
         private ToolStripSeparator toolStripSeparator1;
         private ToolStripMenuItem generate50FibonacciNumbersToolStripMenuItem;
         private ToolStripMenuItem generate100FibonacciNumbersToolStripMenuItem;
-        private TextBox textBox1;
+        private TextBox mainTextBox;
+        private OpenFileDialog openFileDialog;
+        private SaveFileDialog saveFileDialog;
     }
 }

@@ -11,3 +11,6 @@ Disabled "fields should not begin with underscore"
 
 Disabled "documentation should end with a period"
 - This is just not necessary, it doesn't make the code cleaner and it's one more thing that I have to remember to do
+
+Disabled "elements should be documented"
+- Adding documentation to everything just adds clutter to the code. For example, the `Homework3Tests` project contains a class called `TestFibonacciReader`; Adding a documentation comment to that class won't help readability/maintainability. Especially since it's a test class so it probably won't be referenced in code directly. Similarly, for the test methods, Microsoft recommends having descriptive names such as `Add_MaximumSumResult_ThrowsOverflowException`, and these also do not require documentation comments.
