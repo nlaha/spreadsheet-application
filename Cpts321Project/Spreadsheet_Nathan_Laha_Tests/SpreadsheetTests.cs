@@ -44,6 +44,23 @@
         }
 
         /// <summary>
+        /// Tests column name to index functionality
+        /// </summary>
+        [Test]
+        public void Spreadsheet_GetsColumnIndex_FromName()
+        {
+            // arrange
+            char column = 'A';
+            MethodInfo methodInfo = this.GetMethod("ColumnToIndex");
+
+            // act
+            var result = methodInfo.Invoke(this._spreadsheet, new object[] { column });
+
+            // assert
+            Assert.That(result, Is.EqualTo(0));
+        }
+
+        /// <summary>
         /// Gets a method on the main form object using reflection
         /// </summary>
         /// <param name="methodName">the name of the method</param>
