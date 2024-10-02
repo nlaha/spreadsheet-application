@@ -7,7 +7,7 @@ namespace SpreadsheetEngine
     /// <summary>
     /// A cell holding normal text
     /// </summary>
-    internal class TextCell : Cell
+    public class TextCell : Cell
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TextCell"/> class.

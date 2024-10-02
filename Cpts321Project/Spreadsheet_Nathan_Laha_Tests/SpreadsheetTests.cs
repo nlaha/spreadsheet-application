@@ -72,15 +72,15 @@ namespace Spreadsheet_Nathan_Laha_Tests
         {
             // arrange
             MethodInfo methodInfo = this.GetMethod("EvaluateCellFormula");
-            Cell cell = this._spreadsheet.GetCell(0, 0) !;
-            cell.Text = "=A1";
+            TextCell textCell = new (0, 0);
 
             // act
-            var isSuccess = methodInfo.Invoke(this._spreadsheet, new object[] { cell });
+            textCell.Text = "=A1";
+            var isSuccess = methodInfo.Invoke(this._spreadsheet, new object[] { textCell });
 
             // assert
             Assert.That(isSuccess, Is.True);
-            Assert.That(cell.Value, Is.EqualTo(string.Empty));
+            Assert.That(textCell.Value, Is.EqualTo(string.Empty));
         }
 
         /// <summary>
