@@ -33,12 +33,14 @@
         /// Edge case test for GetCell
         /// </summary>
         [Test]
-        public void Spreadsheet_ThrowsWhen_GetCell_OutOfRange()
+        public void Spreadsheet_ReturnsNullWhen_GetCell_OutOfRange()
         {
             // arrange
             // act
+            var result = this._spreadsheet.GetCell(-1, 0);
+
             // assert
-            Assert.Throws<IndexOutOfRangeException>(() => this._spreadsheet.GetCell(-1, 0));
+            Assert.That(result, Is.Null);
         }
 
         /// <summary>
