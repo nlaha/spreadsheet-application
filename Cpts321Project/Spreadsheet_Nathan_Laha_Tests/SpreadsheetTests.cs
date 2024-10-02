@@ -100,6 +100,22 @@ namespace Spreadsheet_Nathan_Laha_Tests
         }
 
         /// <summary>
+        /// Test getting an invalid cell name results in null
+        /// </summary>
+        [Test]
+        public void Spreadsheet_GetCellByName_ReturnsNull()
+        {
+            // arrange
+            MethodInfo methodInfo = this.GetMethod("GetCellByName");
+
+            // act
+            Cell? cell = (Cell?)methodInfo.Invoke(this._spreadsheet, new object[] { "Invalid Name" });
+
+            // assert
+            Assert.That(cell, Is.Null);
+        }
+
+        /// <summary>
         /// Gets a method on the main form object using reflection
         /// </summary>
         /// <param name="methodName">the name of the method</param>
