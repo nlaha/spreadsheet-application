@@ -124,24 +124,15 @@ namespace SpreadsheetEngine
 
             // match on cell names
             Regex regex = new Regex(@"[A-Z]\d");
-            bool colParseSuccess = regex.IsMatch(cell.Text);
-            if (!colParseSuccess)
+            bool cellNameFound = regex.IsMatch(cell.Text);
+            if (!cellNameFound)
             {
                 result = false;
             }
 
-            // parse row index
+            // get cell from name found in formula
             string cellName = regex.Match(cell.Text).Groups[0].Value;
-            string? rowIdxString = cellName[1..];
-            int colIdx = 0;
-            bool rowParseSuccess = int.TryParse(rowIdxString, out colIdx);
-            if (!rowParseSuccess)
-            {
-                result = false;
-            }
-
-            // get cell
-            Cell? refCell = this.GetCell(this.ColumnToIndex(cellName[0]), colIdx);
+            Cell? refCell = this.GetCellByName(cellName);
             if (refCell == null)
             {
                 result = false;
@@ -157,6 +148,29 @@ namespace SpreadsheetEngine
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Gets a cell by it's name, i.e A1 or B23
+        /// </summary>
+        /// <param name="cellName">the cell's name string</param>
+        /// <returns>the cell, or null if not found</returns>
+        private Cell? GetCellByName(string cellName)
+        {
+            // skip the column
+            string? rowIdxString = cellName[1..];
+
+            // parse the row index
+            int rowIdx = 0;
+            bool rowParseSuccess = int.TryParse(rowIdxString, out rowIdx);
+            if (!rowParseSuccess)
+            {
+                return null;
+            }
+
+            // get cell
+            Cell? refCell = this.GetCell(this.ColumnToIndex(cellName[0]), rowIdx);
+            return refCell;
         }
     }
 }
