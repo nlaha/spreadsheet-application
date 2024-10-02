@@ -2,7 +2,7 @@
 // 11762135
 // </copyright>
 
-namespace Spreadsheet_Nathan_Laha
+namespace SpreadsheetEngine
 {
     /// <summary>
     /// Constants class for storing constant values

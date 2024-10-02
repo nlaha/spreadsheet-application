@@ -6,7 +6,6 @@ namespace SpreadsheetEngine
 {
     using System.ComponentModel;
     using System.Text.RegularExpressions;
-    using Spreadsheet_Nathan_Laha;
 
     /// <summary>
     /// Represents a container of cells and the cell factory
@@ -32,13 +31,10 @@ namespace SpreadsheetEngine
                 for (int x = 0; x < numColumns; x++)
                 {
                     this.cells[x, y] = new TextCell(x, y);
-                }
-            }
 
-            // subscribe to change events
-            foreach (var cell in this.cells)
-            {
-                cell.PropertyChanged += this.OnCellPropertyChanged;
+                    // subscribe to change events
+                    this.cells[x, y].PropertyChanged += this.OnCellPropertyChanged;
+                }
             }
         }
 
@@ -56,6 +52,26 @@ namespace SpreadsheetEngine
         /// Gets the number of rows
         /// </summary>
         public int RowCount { get => this.cells.GetLength(1); }
+
+        /// <summary>
+        /// Performs the demo for HW4
+        /// </summary>
+        public void PerformDemo()
+        {
+            var random = new Random();
+            for (int i = 0; i < 100; i++)
+            {
+                this.cells[
+                    random.Next(0, this.ColumnCount - 1),
+                    random.Next(0, this.RowCount - 1)].Text = "Hello World!";
+            }
+
+            for (int i = 0; i < this.RowCount; i++)
+            {
+                this.cells[1, i].Text = $"This is cell B{i}";
+                this.cells[0, i].Text = $"=B{i}";
+            }
+        }
 
         /// <summary>
         /// Gets the cell at the specified location
@@ -92,13 +108,12 @@ namespace SpreadsheetEngine
         /// </summary>
         /// <param name="sender">the cell</param>
         /// <param name="e">the args</param>
+        /// <exception cref="ArgumentNullException">thrown when cell is null</exception>
         private void OnCellPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             Cell? cell = sender as Cell;
             if (cell != null)
             {
-                this.CellPropertyChanged?.Invoke(cell, e);
-
                 // cell doesn't have a formula
                 if (!cell.Text.StartsWith('='))
                 {
@@ -108,6 +123,14 @@ namespace SpreadsheetEngine
                 {
                     this.EvaluateCellFormula(cell);
                 }
+
+                // invoke the property changed event
+                // this should trigger an update in the UI
+                this.CellPropertyChanged?.Invoke(cell, e);
+            }
+            else
+            {
+                throw new ArgumentNullException(nameof(cell));
             }
         }
 

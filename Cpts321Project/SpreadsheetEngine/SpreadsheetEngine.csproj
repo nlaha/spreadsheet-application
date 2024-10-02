@@ -27,8 +27,4 @@
 	    </AssemblyAttribute>
     </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Spreadsheet_Nathan_Laha\Spreadsheet_Nathan_Laha.csproj" />
-  </ItemGroup>
-
 </Project>
