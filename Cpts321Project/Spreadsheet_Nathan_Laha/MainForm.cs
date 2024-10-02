@@ -24,7 +24,7 @@ namespace Spreadsheet_Nathan_Laha
         public MainForm()
         {
             this.InitializeComponent();
-            this.InitializeDataGrid();
+            this.InitializeDataGrid(this.dataGrid);
         }
 
         /// <summary>
@@ -47,12 +47,13 @@ namespace Spreadsheet_Nathan_Laha
         /// <summary>
         /// Initializes the UI data grid with columns and rows
         /// </summary>
-        private void InitializeDataGrid()
+        /// <param name="dataGrid">the data grid to initialize</param>
+        private void InitializeDataGrid(DataGridView dataGrid)
         {
             // initialize columns
             foreach (var letter in LETTERS.ToCharArray())
             {
-                this.dataGrid.Columns.Add(new DataGridViewColumn
+                dataGrid.Columns.Add(new DataGridViewColumn
                 {
                     HeaderText = letter.ToString(),
                     CellTemplate = new DataGridViewTextBoxCell(),
@@ -60,7 +61,7 @@ namespace Spreadsheet_Nathan_Laha
             }
 
             // initialize rows
-            this.dataGrid.Rows.Add(50);
+            dataGrid.Rows.Add(50);
 
             // number rows
             foreach (DataGridViewRow row in this.dataGrid.Rows)
@@ -71,7 +72,7 @@ namespace Spreadsheet_Nathan_Laha
             SetDoubleBuffer(this.dataGrid, true);
 
             // make sure numbers are all visible
-            this.dataGrid.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
+            dataGrid.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
         }
     }
 }
