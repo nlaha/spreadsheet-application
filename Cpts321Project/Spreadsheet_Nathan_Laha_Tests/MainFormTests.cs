@@ -1,4 +1,8 @@
-﻿namespace Spreadsheet_Nathan_Laha_Tests
+﻿// <copyright file="MainFormTests.cs" company="Nathan Laha">
+// 11762135
+// </copyright>
+
+namespace Spreadsheet_Nathan_Laha_Tests
 {
     using System.Reflection;
     using System.Windows.Forms;
@@ -29,7 +33,7 @@
 
             // assert
             Assert.That(dataGridView.Columns.Count, Is.EqualTo(26));
-            Assert.That(dataGridView.Rows.Count , Is.EqualTo(50));
+            Assert.That(dataGridView.Rows.Count, Is.EqualTo(50));
         }
 
         /// <summary>

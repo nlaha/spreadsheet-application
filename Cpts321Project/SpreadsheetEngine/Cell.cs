@@ -18,15 +18,21 @@ namespace SpreadsheetEngine
         protected string _text;
 
         /// <summary>
+        /// Protected field for the cell value
+        /// </summary>
+        protected string _value;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Cell"/> class.
         /// </summary>
         /// <param name="rowIndex">the row index of the cell</param>
         /// <param name="columnIndex">the column index of the cell</param>
-        public Cell(int rowIndex, int columnIndex)
+        public Cell(int columnIndex, int rowIndex)
         {
             this.RowIndex = rowIndex;
             this.ColumnIndex = columnIndex;
             this._text = string.Empty;
+            this._value = string.Empty;
         }
 
         /// <inheritdoc/>
@@ -59,19 +65,14 @@ namespace SpreadsheetEngine
         }
 
         /// <summary>
-        /// Gets the computed value of the cell
+        /// Gets or sets the computed value of the cell
         /// </summary>
         public string Value
         {
-            get
+            get => this._value;
+            protected internal set
             {
-                if (!this._text.StartsWith("="))
-                {
-                    return this._text;
-                } else
-                {
-                    throw new NotImplementedException("Formula evaluation not implemented");
-                }
+                this._value = value;
             }
         }
 
