@@ -16,7 +16,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
             MethodInfo methodInfo = this.GetMethod("InitializeDataGrid");
 
             // act
-            methodInfo.Invoke(this, new object[] { dataGridView });
+            methodInfo.Invoke(this._mainForm, new object[] { dataGridView });
 
             // assert
             Assert.That(dataGridView.Columns.Count, Is.EqualTo(26));

@@ -13,12 +13,6 @@ namespace Spreadsheet_Nathan_Laha
     public partial class MainForm : Form
     {
         /// <summary>
-        /// Constant storing a string with each letter of the alphabet.
-        /// Used for column names.
-        /// </summary>
-        private const string LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="MainForm"/> class.
         /// </summary>
         public MainForm()
@@ -51,7 +45,7 @@ namespace Spreadsheet_Nathan_Laha
         private void InitializeDataGrid(DataGridView dataGrid)
         {
             // initialize columns
-            foreach (var letter in LETTERS.ToCharArray())
+            foreach (var letter in Constants.COLUMNS.ToCharArray())
             {
                 dataGrid.Columns.Add(new DataGridViewColumn
                 {
@@ -61,7 +55,7 @@ namespace Spreadsheet_Nathan_Laha
             }
 
             // initialize rows
-            dataGrid.Rows.Add(50);
+            dataGrid.Rows.Add(Constants.NUMROWS - 1);
 
             // number rows
             foreach (DataGridViewRow row in this.dataGrid.Rows)
