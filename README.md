@@ -11,3 +11,6 @@ Disabled "fields should not begin with underscore"
 
 Disabled "documentation should end with a period"
 - This is just not necessary, it doesn't make the code cleaner and it's one more thing that I have to remember to do
+
+Disabled "fields should be private"
+- We need to have a protected member field for the Cell abstract class

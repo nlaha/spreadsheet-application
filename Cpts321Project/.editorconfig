@@ -1,0 +1,10 @@
+[*.cs]
+
+# SA1309: Field names should not begin with underscore
+dotnet_diagnostic.SA1309.severity = none
+
+# SA1629: Documentation text should end with a period
+dotnet_diagnostic.SA1629.severity = none
+
+# SA1401: Fields should be private
+dotnet_diagnostic.SA1401.severity = none
