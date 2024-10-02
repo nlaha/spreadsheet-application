@@ -73,14 +73,30 @@ namespace Spreadsheet_Nathan_Laha_Tests
             // arrange
             MethodInfo methodInfo = this.GetMethod("EvaluateCellFormula");
             TextCell textCell = new (0, 0);
+            textCell.Text = "=A1";
 
             // act
-            textCell.Text = "=A1";
             var isSuccess = methodInfo.Invoke(this._spreadsheet, new object[] { textCell });
 
             // assert
             Assert.That(isSuccess, Is.True);
             Assert.That(textCell.Value, Is.EqualTo(string.Empty));
+        }
+
+        /// <summary>
+        /// Test getting a cell by it's name i.e. 'A0'
+        /// </summary>
+        [Test]
+        public void Spreadsheet_GetCellByName()
+        {
+            // arrange
+            MethodInfo methodInfo = this.GetMethod("GetCellByName");
+
+            // act
+            Cell? cell = (Cell?)methodInfo.Invoke(this._spreadsheet, new object[] { "A0" });
+
+            // assert
+            Assert.That(cell, Is.EqualTo(this._spreadsheet.GetCell(0, 0)));
         }
 
         /// <summary>
