@@ -1,4 +1,8 @@
-﻿namespace Spreadsheet_Nathan_Laha_Tests
+﻿// <copyright file="SpreadsheetTests.cs" company="Nathan Laha">
+// 11762135
+// </copyright>
+
+namespace Spreadsheet_Nathan_Laha_Tests
 {
     using System.Reflection;
     using Spreadsheet_Nathan_Laha;
@@ -58,6 +62,25 @@
 
             // assert
             Assert.That(result, Is.EqualTo(0));
+        }
+
+        /// <summary>
+        /// Test the basic reference formaula
+        /// </summary>
+        [Test]
+        public void Spreadsheet_Evaluate_BasicReferenceFormula()
+        {
+            // arrange
+            MethodInfo methodInfo = this.GetMethod("EvaluateCellFormula");
+            Cell cell = this._spreadsheet.GetCell(0, 0) !;
+            cell.Text = "=A1";
+
+            // act
+            var isSuccess = methodInfo.Invoke(this._spreadsheet, new object[] { cell });
+
+            // assert
+            Assert.That(isSuccess, Is.True);
+            Assert.That(cell.Value, Is.EqualTo(string.Empty));
         }
 
         /// <summary>
