@@ -4,6 +4,7 @@
 
 namespace SpreadsheetEngine.ExpressionTree
 {
+    using System.ComponentModel;
     using SpreadsheetEngine.Exceptions;
 
     /// <summary>
@@ -14,11 +15,13 @@ namespace SpreadsheetEngine.ExpressionTree
         /// <summary>
         /// Addition, +
         /// </summary>
+        [Description("+")]
         Add,
 
         /// <summary>
         /// Subtraction, -
         /// </summary>
+        [Description("-")]
         Subtract,
     }
 

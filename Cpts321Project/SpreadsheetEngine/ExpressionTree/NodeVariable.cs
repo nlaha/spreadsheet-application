@@ -2,10 +2,10 @@
 // 11762135
 // </copyright>
 
-using SpreadsheetEngine.Exceptions;
-
 namespace SpreadsheetEngine.ExpressionTree
 {
+    using SpreadsheetEngine.Exceptions;
+
     /// <summary>
     /// Represents an expression tree variable node
     /// </summary>

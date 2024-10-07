@@ -4,6 +4,12 @@
 
 namespace SpreadsheetEngine.ExpressionTree
 {
+    using SpreadsheetEngine.Exceptions;
+    using System.Collections;
+    using System.ComponentModel;
+    using System.Linq;
+    using System.Text.RegularExpressions;
+
     /// <summary>
     /// Represents an expression tree that will be evaluated to
     /// numeric values
@@ -29,7 +35,19 @@ namespace SpreadsheetEngine.ExpressionTree
             this._expression = expression;
             this.Variables = new Dictionary<string, double>();
 
-            // TODO: init _tree
+            // get the next expression node
+            // expressions need to start with a variable node, or constant node
+            var isNumericConstant = Regex.Match(expression, @"^\d+(\.+\d+)*");
+            var isVariable = Regex.Match(expression, @"");
+
+            if (isNumericConstant.Success || isVariable.Success)
+            {
+                throw new NotImplementedException();
+            }
+            else
+            {
+                throw new InvalidExpressionTreeException("Expressions must start with a variable or constant");
+            }
         }
 
         /// <summary>

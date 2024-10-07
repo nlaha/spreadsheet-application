@@ -14,3 +14,6 @@ Disabled "documentation should end with a period"
 
 Disabled "fields should be private"
 - We need to have a protected member field for the Cell abstract class
+
+Disabled "Opening square brackets should be spaced correctly"
+- This contradicts with another rule for spacing after equal signs
