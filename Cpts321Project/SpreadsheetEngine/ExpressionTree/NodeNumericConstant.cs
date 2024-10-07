@@ -9,5 +9,24 @@ namespace SpreadsheetEngine.ExpressionTree
     /// </summary>
     internal class NodeNumericConstant : Node
     {
+        /// <summary>
+        /// The numeric constant value
+        /// </summary>
+        private readonly double _value;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NodeNumericConstant"/> class.
+        /// </summary>
+        /// <param name="value">the constant value</param>
+        public NodeNumericConstant(double value)
+        {
+            this._value = value;
+        }
+
+        /// <inheritdoc/>
+        internal override double Evaluate()
+        {
+            return this._value;
+        }
     }
 }

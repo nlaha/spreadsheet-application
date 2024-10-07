@@ -7,7 +7,17 @@ namespace SpreadsheetEngine.ExpressionTree
     /// <summary>
     /// Base class for expression tree nodes
     /// </summary>
-    internal class Node
+    internal abstract class Node
     {
+        /// <summary>
+        /// Gets the value of the node (and evaluates children if they exist)
+        /// </summary>
+        public double Value { get => this.Evaluate(); }
+
+        /// <summary>
+        /// Evaluates the value of this node and all child nodes
+        /// </summary>
+        /// <returns>the evaluated value</returns>
+        internal abstract double Evaluate();
     }
 }
