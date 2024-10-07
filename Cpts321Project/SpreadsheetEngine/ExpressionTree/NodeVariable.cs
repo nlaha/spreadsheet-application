@@ -2,6 +2,8 @@
 // 11762135
 // </copyright>
 
+using SpreadsheetEngine.Exceptions;
+
 namespace SpreadsheetEngine.ExpressionTree
 {
     /// <summary>
@@ -33,7 +35,13 @@ namespace SpreadsheetEngine.ExpressionTree
         /// <inheritdoc/>
         internal override double Evaluate()
         {
-            throw new NotImplementedException();
+            if (this._expressionTree.Variables.ContainsKey(this.Name))
+            {
+                return this._expressionTree.Variables[this.Name];
+            } else
+            {
+                throw new InvalidExpressionTreeException($"Referenced variable: \"{this.Name}\" cannot be found!");
+            }
         }
     }
 }

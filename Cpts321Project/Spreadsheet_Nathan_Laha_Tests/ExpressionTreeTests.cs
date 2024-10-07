@@ -96,5 +96,21 @@ namespace Spreadsheet_Nathan_Laha_Tests
                 expressionTree.Evaluate();
             });
         }
+
+        /// <summary>
+        /// Test a more complex expression
+        /// </summary>
+        [Test]
+        public void ExpressionTree_ComplexExpression()
+        {
+            // arrange
+            var tree = new ExpressionTree("12+12+24");
+
+            // act
+            var result = tree.Evaluate();
+
+            // assert
+            Assert.That(result, Is.EqualTo(48));
+        }
     }
 }

@@ -26,10 +26,16 @@ namespace SpreadsheetEngine.ExpressionTree
         /// <param name="expression">the expression to generate the tree from</param>
         public ExpressionTree(string expression)
         {
-            _expression = expression;
+            this._expression = expression;
+            this.Variables = new Dictionary<string, double>();
 
             // TODO: init _tree
         }
+
+        /// <summary>
+        /// Gets dictionary of variables for this expression
+        /// </summary>
+        public Dictionary<string, double> Variables { get; }
 
         /// <summary>
         /// Sets the specified variable within the expression tree variables dictionary
@@ -38,7 +44,7 @@ namespace SpreadsheetEngine.ExpressionTree
         /// <param name="variableValue">the variable value</param>
         public void SetVariable(string variableName, double variableValue)
         {
-
+            this.Variables[variableName] = variableValue;
         }
 
         /// <summary>

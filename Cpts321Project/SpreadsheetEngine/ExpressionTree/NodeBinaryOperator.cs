@@ -4,6 +4,8 @@
 
 namespace SpreadsheetEngine.ExpressionTree
 {
+    using SpreadsheetEngine.Exceptions;
+
     /// <summary>
     /// Represents a binary operator, i.e. + or -
     /// </summary>
@@ -56,7 +58,12 @@ namespace SpreadsheetEngine.ExpressionTree
         /// <inheritdoc/>
         internal override double Evaluate()
         {
-            throw new NotImplementedException();
+            return this.Operator switch
+            {
+                BinaryOperator.Add => this.LhsChild.Evaluate() + this.RhsChild.Evaluate(),
+                BinaryOperator.Subtract => this.LhsChild.Evaluate() - this.RhsChild.Evaluate(),
+                _ => throw new InvalidExpressionTreeException("Invalid operator in expression!"),
+            };
         }
     }
 }
