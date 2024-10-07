@@ -146,7 +146,7 @@ namespace SpreadsheetEngine
             // simple cell value fetch formula
 
             // match on cell names
-            Regex regex = new Regex(@"[A-Z]\d");
+            Regex regex = new Regex(@"[A-Z]\d*");
             bool cellNameFound = regex.IsMatch(cell.Text);
             if (!cellNameFound)
             {
