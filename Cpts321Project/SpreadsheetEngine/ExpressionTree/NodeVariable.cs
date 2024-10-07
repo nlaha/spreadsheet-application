@@ -10,19 +10,19 @@ namespace SpreadsheetEngine.ExpressionTree
     internal class NodeVariable : Node
     {
         /// <summary>
-        /// The variable value
+        /// Reference to parent expression tree instance
         /// </summary>
-        private readonly double _value;
+        private readonly ExpressionTree _expressionTree;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NodeVariable"/> class.
         /// </summary>
+        /// <param name="expressionTree">the parent expression tree</param>
         /// <param name="name">the variable name</param>
-        /// <param name="value">the variable value</param>
-        public NodeVariable(string name, double value)
+        public NodeVariable(ExpressionTree expressionTree, string name)
         {
+            this._expressionTree = expressionTree;
             this.Name = name;
-            this._value = value;
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace SpreadsheetEngine.ExpressionTree
         /// <inheritdoc/>
         internal override double Evaluate()
         {
-            return this._value;
+            throw new NotImplementedException();
         }
     }
 }

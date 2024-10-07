@@ -30,6 +30,7 @@ namespace SpreadsheetEngine.ExpressionTree
         /// </summary>
         /// <param name="lhsChild">the left hand child</param>
         /// <param name="rhsChild">the right hand child</param>
+        /// <param name="op">the operation to perform when evaluated</param>
         public NodeBinaryOperator(Node lhsChild, Node rhsChild, BinaryOperator op)
         {
             this.LhsChild = lhsChild;
