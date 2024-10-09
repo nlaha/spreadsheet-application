@@ -1,4 +1,8 @@
-﻿namespace SpreadsheetEngine.Exceptions
+﻿// <copyright file="InvalidExpressionTreeException.cs" company="Nathan Laha">
+// 11762135
+// </copyright>
+
+namespace SpreadsheetEngine.Exceptions
 {
     /// <summary>
     /// Exception thrown when an expression tree is invalid
@@ -29,6 +33,8 @@
         /// <param name="message">the message</param>
         /// <param name="inner">the inner exception</param>
         public InvalidExpressionTreeException(string message, Exception inner)
-            : base(message, inner) { }
+            : base(message, inner)
+        {
+        }
     }
 }

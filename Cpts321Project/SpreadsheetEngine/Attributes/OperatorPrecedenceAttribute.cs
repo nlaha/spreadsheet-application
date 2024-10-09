@@ -1,4 +1,8 @@
-﻿namespace SpreadsheetEngine.Attributes
+﻿// <copyright file="OperatorPrecedenceAttribute.cs" company="Nathan Laha">
+// 11762135
+// </copyright>
+
+namespace SpreadsheetEngine.Attributes
 {
     /// <summary>
     /// Attribute used on operator enum

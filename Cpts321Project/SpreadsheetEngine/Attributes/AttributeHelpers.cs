@@ -1,7 +1,11 @@
-﻿using System.ComponentModel;
+﻿// <copyright file="AttributeHelpers.cs" company="Nathan Laha">
+// 11762135
+// </copyright>
 
 namespace SpreadsheetEngine.Attributes
 {
+    using System.ComponentModel;
+
     /// <summary>
     /// Helper class for attributes
     /// </summary>

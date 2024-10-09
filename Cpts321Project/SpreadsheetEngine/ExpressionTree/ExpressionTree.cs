@@ -118,7 +118,8 @@ namespace SpreadsheetEngine.ExpressionTree
                         operatorNode.RhsChild = operands.Pop();
                         operatorNode.LhsChild = operands.Pop();
                         operands.Push(operatorNode);
-                    } else
+                    }
+                    else
                     {
                         throw new InvalidExpressionTreeException("Binary operator malformed, ensure operands exist!");
                     }
@@ -155,7 +156,8 @@ namespace SpreadsheetEngine.ExpressionTree
             if (this._tree != null)
             {
                 return this._tree.Evaluate();
-            } else
+            }
+            else
             {
                 throw new InvalidExpressionTreeException("Expression tree is empty");
             }
