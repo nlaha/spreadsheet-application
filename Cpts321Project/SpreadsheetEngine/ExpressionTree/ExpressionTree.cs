@@ -126,7 +126,7 @@ namespace SpreadsheetEngine.ExpressionTree
                 }
             }
 
-            if (operators.Count > 0)
+            if (operands.Count == 1)
             {
                 this._tree = operands.Peek();
             }
