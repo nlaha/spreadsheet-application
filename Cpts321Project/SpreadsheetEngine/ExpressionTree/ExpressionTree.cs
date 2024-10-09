@@ -74,7 +74,7 @@ namespace SpreadsheetEngine.ExpressionTree
                         // is it an operator or operand?
                         if (operatorTypes.Contains(type))
                         {
-                                                        var newOperator = new NodeBinaryOperator(token);
+                            var newOperator = new NodeBinaryOperator(token);
 
                             // process binary operators
                             while (operators.Count > 0 && (operators.Peek() as IOperatorNode)!.Precedence >= newOperator.Precedence)
