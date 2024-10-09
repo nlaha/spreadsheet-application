@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35208.52
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spreadsheet_Nathan_Laha", "Spreadsheet_Nathan_Laha\Spreadsheet_Nathan_Laha.csproj", "{8F2B2E9E-3AFD-40FA-A9FE-4FED805BE26E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spreadsheet_Nathan_Laha", "Spreadsheet_Nathan_Laha\Spreadsheet_Nathan_Laha.csproj", "{8F2B2E9E-3AFD-40FA-A9FE-4FED805BE26E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spreadsheet_Nathan_Laha_Tests", "Spreadsheet_Nathan_Laha_Tests\Spreadsheet_Nathan_Laha_Tests.csproj", "{8F7CB6C0-A024-494A-A80F-EDA52EBB60D4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spreadsheet_Nathan_Laha_Tests", "Spreadsheet_Nathan_Laha_Tests\Spreadsheet_Nathan_Laha_Tests.csproj", "{8F7CB6C0-A024-494A-A80F-EDA52EBB60D4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpreadsheetEngine", "SpreadsheetEngine\SpreadsheetEngine.csproj", "{F2853C04-3FB4-465C-BEA5-1F548AA5A6E4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpreadsheetEngine", "SpreadsheetEngine\SpreadsheetEngine.csproj", "{F2853C04-3FB4-465C-BEA5-1F548AA5A6E4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressionTreeDemo", "ExpressionTreeDemo\ExpressionTreeDemo.csproj", "{82321A53-221C-4479-82F5-3BA38F9B4BDE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{F2853C04-3FB4-465C-BEA5-1F548AA5A6E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F2853C04-3FB4-465C-BEA5-1F548AA5A6E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F2853C04-3FB4-465C-BEA5-1F548AA5A6E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{82321A53-221C-4479-82F5-3BA38F9B4BDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82321A53-221C-4479-82F5-3BA38F9B4BDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{82321A53-221C-4479-82F5-3BA38F9B4BDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82321A53-221C-4479-82F5-3BA38F9B4BDE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
