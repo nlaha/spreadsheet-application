@@ -8,14 +8,20 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="InvalidExpressionTreeException"/> class.
         /// </summary>
-        public InvalidExpressionTreeException() { }
+        public InvalidExpressionTreeException()
+        {
+            return;
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InvalidExpressionTreeException"/> class.
         /// </summary>
         /// <param name="message">the message</param>
         public InvalidExpressionTreeException(string message)
-            : base(message) { }
+            : base(message)
+        {
+            return;
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InvalidExpressionTreeException"/> class.

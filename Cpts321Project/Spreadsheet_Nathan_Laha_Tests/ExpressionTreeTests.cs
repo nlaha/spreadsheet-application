@@ -19,9 +19,12 @@ namespace Spreadsheet_Nathan_Laha_Tests
         public void NodeBinaryOperator_Evaluate()
         {
             // arrange
-            var lhs = new NodeNumericConstant(10.0);
-            var rhs = new NodeNumericConstant(5.0);
-            var node = new NodeBinaryOperator(lhs, rhs, BinaryOperator.Add);
+            var lhs = new NodeNumericConstant("10.0");
+            var rhs = new NodeNumericConstant("5.0");
+            var node = new NodeBinaryOperator("+");
+
+            node.LhsChild = lhs;
+            node.RhsChild = rhs;
 
             // act
             var result = node.Evaluate();
@@ -55,7 +58,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
         public void NodeNumericConstant_Evaluate()
         {
             // arrange
-            var node = new NodeNumericConstant(123.0);
+            var node = new NodeNumericConstant("123.0");
 
             // act
             var result = node.Evaluate();

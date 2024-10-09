@@ -4,11 +4,12 @@
 
 namespace SpreadsheetEngine.ExpressionTree
 {
-    using SpreadsheetEngine.Exceptions;
     using System.Collections;
-    using System.ComponentModel;
-    using System.Linq;
+    using System.Text;
     using System.Text.RegularExpressions;
+    using SpreadsheetEngine.Attributes;
+    using SpreadsheetEngine.Exceptions;
+    using SpreadsheetEngine.ExpressionTree.Interfaces;
 
     /// <summary>
     /// Represents an expression tree that will be evaluated to
@@ -24,7 +25,7 @@ namespace SpreadsheetEngine.ExpressionTree
         /// <summary>
         /// The root node of the expression tree
         /// </summary>
-        private readonly Node _tree;
+        private readonly Node? _tree;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExpressionTree"/> class.
@@ -35,18 +36,98 @@ namespace SpreadsheetEngine.ExpressionTree
             this._expression = expression;
             this.Variables = new Dictionary<string, double>();
 
-            // get the next expression node
-            // expressions need to start with a variable node, or constant node
-            var isNumericConstant = Regex.Match(expression, @"^\d+(\.+\d+)*");
-            var isVariable = Regex.Match(expression, @"");
+            // Source: https://stackoverflow.com/a/26750/24202835
+            var nodeInterface = typeof(IMatchableExpressionNode);
+            var operatorInterface = typeof(IOperatorNode);
 
-            if (isNumericConstant.Success || isVariable.Success)
+            var nodeTypes = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(s => s.GetTypes())
+                .Where(p => nodeInterface.IsAssignableFrom(p) && !p.IsInterface && !p.IsAbstract);
+
+            var operatorTypes = nodeTypes.Where(t => operatorInterface.IsAssignableFrom(t));
+
+            // build token regex
+            var tokenRegexStr = new List<string>();
+            foreach (var type in nodeTypes)
             {
-                throw new NotImplementedException();
+                var typeRegex = type.GetProperty("NodeRegex")?.GetValue(null) as string;
+                if (typeRegex != null)
+                {
+                    tokenRegexStr.Add(typeRegex);
+                }
             }
-            else
+
+            MatchCollection tokens = Regex.Matches(expression, string.Join("|", tokenRegexStr));
+
+            var operands = new Stack<Node>();
+            var operators = new Stack<Node>();
+
+            // Based on: https://algo.monster/liteproblems/1597
+            // construct tree
+            foreach (string token in tokens.Select(m => m.Value))
             {
-                throw new InvalidExpressionTreeException("Expressions must start with a variable or constant");
+                foreach (var type in nodeTypes)
+                {
+                    var typeRegex = type.GetProperty("NodeRegex")?.GetValue(null) as string;
+                    if (typeRegex != null && Regex.IsMatch(token, typeRegex))
+                    {
+                        // is it an operator or operand?
+                        if (operatorTypes.Contains(type))
+                        {
+                                                        var newOperator = new NodeBinaryOperator(token);
+
+                            // process binary operators
+                            while (operators.Count > 0 && (operators.Peek() as IOperatorNode)!.Precedence >= newOperator.Precedence)
+                            {
+                                var op = operators.Pop() as NodeBinaryOperator;
+                                if (op != null)
+                                {
+                                    op.RhsChild = operands.Pop();
+                                    op.LhsChild = operands.Pop();
+                                    operands.Push(op);
+                                }
+                            }
+
+                            operators.Push(newOperator);
+                        }
+                        else
+                        {
+                            // it's an operand
+                            switch (type)
+                            {
+                                case Type t when t == typeof(NodeNumericConstant):
+                                    operands.Push(new NodeNumericConstant(token));
+                                    break;
+                                case Type t when t == typeof(NodeVariable):
+                                    operands.Push(new NodeVariable(this, token));
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // post process binary operators
+            while (operators.Count > 0)
+            {
+                var operatorNode = operators.Pop() as NodeBinaryOperator;
+                if (operatorNode != null)
+                {
+                    if (operands.Count > 1)
+                    {
+                        operatorNode.RhsChild = operands.Pop();
+                        operatorNode.LhsChild = operands.Pop();
+                        operands.Push(operatorNode);
+                    } else
+                    {
+                        throw new InvalidExpressionTreeException("Binary operator malformed, ensure operands exist!");
+                    }
+                }
+            }
+
+            if (operators.Count > 0)
+            {
+                this._tree = operands.Peek();
             }
         }
 
@@ -71,7 +152,13 @@ namespace SpreadsheetEngine.ExpressionTree
         /// <returns>the evaluated value</returns>
         public double Evaluate()
         {
-            return 0.0;
+            if (this._tree != null)
+            {
+                return this._tree.Evaluate();
+            } else
+            {
+                throw new InvalidExpressionTreeException("Expression tree is empty");
+            }
         }
     }
 }

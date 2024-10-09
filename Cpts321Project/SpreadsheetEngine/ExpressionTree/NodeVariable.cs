@@ -5,11 +5,12 @@
 namespace SpreadsheetEngine.ExpressionTree
 {
     using SpreadsheetEngine.Exceptions;
+    using SpreadsheetEngine.ExpressionTree.Interfaces;
 
     /// <summary>
     /// Represents an expression tree variable node
     /// </summary>
-    internal class NodeVariable : Node
+    internal class NodeVariable : Node, IMatchableExpressionNode
     {
         /// <summary>
         /// Reference to parent expression tree instance
@@ -28,6 +29,11 @@ namespace SpreadsheetEngine.ExpressionTree
         }
 
         /// <summary>
+        /// Gets node regex
+        /// </summary>
+        public static string NodeRegex => @"[A-Za-z]\w+";
+
+        /// <summary>
         /// Gets or sets the variable name
         /// </summary>
         public string Name { get; set; }
@@ -38,7 +44,8 @@ namespace SpreadsheetEngine.ExpressionTree
             if (this._expressionTree.Variables.ContainsKey(this.Name))
             {
                 return this._expressionTree.Variables[this.Name];
-            } else
+            }
+            else
             {
                 throw new InvalidExpressionTreeException($"Referenced variable: \"{this.Name}\" cannot be found!");
             }

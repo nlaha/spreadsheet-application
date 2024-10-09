@@ -17,3 +17,6 @@ Disabled "fields should be private"
 
 Disabled "Opening square brackets should be spaced correctly"
 - This contradicts with another rule for spacing after equal signs
+
+Disabled "Closing parenthesis should be spaced correctly"
+- This causes problems with the `!` operator when using it after parentheses, it forces an extra space which looks bad
