@@ -69,7 +69,9 @@ namespace SpreadsheetEngine.ExpressionTree
                 foreach (var type in nodeTypes)
                 {
                     var typeRegex = type.GetProperty("NodeRegex")?.GetValue(null) as string;
-                    if (typeRegex != null && Regex.IsMatch(token, typeRegex))
+
+                    // match from the start of the string using "^"
+                    if (typeRegex != null && Regex.IsMatch(token, "^" + typeRegex))
                     {
                         // is it an operator or operand?
                         if (operatorTypes.Contains(type))

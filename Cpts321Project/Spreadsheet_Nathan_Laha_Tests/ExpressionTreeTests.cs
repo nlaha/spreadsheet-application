@@ -115,5 +115,23 @@ namespace Spreadsheet_Nathan_Laha_Tests
             // assert
             Assert.That(result, Is.EqualTo(48));
         }
+
+        /// <summary>
+        /// Tests expression tree with variables
+        /// </summary>
+        [Test]
+        public void ExpressionTree_Variables()
+        {
+            // arrange
+            var tree = new ExpressionTree("B4+A2+24");
+            tree.SetVariable("B4", 2);
+            tree.SetVariable("A2", 3);
+
+            // act
+            var result = tree.Evaluate();
+
+            // assert
+            Assert.That(result, Is.EqualTo(29));
+        }
     }
 }
