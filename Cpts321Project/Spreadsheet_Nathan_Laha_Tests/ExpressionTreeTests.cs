@@ -27,7 +27,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
             // arrange
             var lhs = new NodeNumericConstant("10.0");
             var rhs = new NodeNumericConstant("5.0");
-            var node = OperatorNodeFactory.CreateBinaryOperator('+');
+            var node = NodeFactory.CreateBinaryOperator('+');
 
             // extra assert
             Assert.That(node, Is.Not.Null);
@@ -51,7 +51,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
             // arrange
             var expressionTree = new ExpressionTree(string.Empty);
             expressionTree.SetVariable("test", 123.0);
-            var node = new NodeVariable(expressionTree, "test");
+            var node = new NodeVariable(expressionTree.Variables, "test");
 
             // act
             var result = node.Evaluate();
