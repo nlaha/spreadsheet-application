@@ -6,12 +6,18 @@ namespace Spreadsheet_Nathan_Laha_Tests
 {
     using SpreadsheetEngine.Exceptions;
     using SpreadsheetEngine.ExpressionTree;
+    using System.Windows.Forms;
 
     /// <summary>
     /// Test the expression tree class and related classes
     /// </summary>
     internal class ExpressionTreeTests
     {
+        /// <summary>
+        /// Expression tree instance
+        /// </summary>
+        private ExpressionTree _expressionTree = new (string.Empty);
+
         /// <summary>
         /// Test binary operator evaluation
         /// </summary>
@@ -21,10 +27,13 @@ namespace Spreadsheet_Nathan_Laha_Tests
             // arrange
             var lhs = new NodeNumericConstant("10.0");
             var rhs = new NodeNumericConstant("5.0");
-            var node = new NodeBinaryOperator("+");
+            var node = OperatorNodeFactory.CreateBinaryOperator('+');
 
-            node.LhsChild = lhs;
-            node.RhsChild = rhs;
+            // extra assert
+            Assert.That(node, Is.Not.Null);
+
+            node.Left = lhs;
+            node.Right = rhs;
 
             // act
             var result = node.Evaluate();
@@ -132,6 +141,30 @@ namespace Spreadsheet_Nathan_Laha_Tests
 
             // assert
             Assert.That(result, Is.EqualTo(29));
+        }
+
+        /// <summary>
+        /// Tests the shunting yard algorithm
+        /// </summary>
+        /// <param name="infixExpression">the infix expression</param>
+        /// <param name="postfixExpression">the expected postfix expression</param>
+        [Test]
+        [TestCase("12+12", new string[] { "12", "12", "+" })]
+        [TestCase("12+12+24", new string[] { "12", "12", "+", "24", "+" })]
+        [TestCase("12+12*24", new string[] { "12", "12", "24", "*", "+" })]
+        [TestCase("12+12*24/2", new string[] { "12", "12", "24", "*", "2", "/", "+" })]
+        [TestCase("12+12*24/2-1", new string[] { "12", "12", "24", "*", "2", "/", "+", "1", "-" })]
+        [TestCase("(12+12)*24/2-1", new string[] { "12", "12", "+", "24", "*", "2", "/", "1", "-" })]
+        public void ExpressionTree_PerformShuntingYardAlgorithm(string infixExpression, string[] postfixExpression)
+        {
+            // arrange
+            var methodInfo = TestHelpers.GetMethod(this._expressionTree, "PerformShuntingYardAlgorithm");
+
+            // act
+            var result = methodInfo.Invoke(this._expressionTree, new object[] { infixExpression });
+
+            // assert
+            Assert.That(result, Is.EqualTo(postfixExpression));
         }
     }
 }
