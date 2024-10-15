@@ -59,5 +59,25 @@ namespace Spreadsheet_Nathan_Laha_Tests
             Assert.That(node.GetType(), Is.EqualTo(expectedType));
             Assert.That(str, Is.EqualTo(string.Empty));
         }
+
+        /// <summary>
+        /// Tests if create node can accept expressions with parentheses
+        /// </summary>
+        /// <param name="expression">expression</param>
+        [Test]
+        [TestCase("(")]
+        [TestCase(")")]
+        [TestCase("...")]
+        public void NodeFactory_ThrowsOnInvalid(string expression)
+        {
+            // arrange
+            // act
+            // assert
+            var node = null as Node;
+            Assert.Throws<InvalidExpressionTreeException>(() =>
+            {
+                NodeFactory.CreateNode(new Dictionary<string, double> { }, expression, out node);
+            });
+        }
     }
 }
