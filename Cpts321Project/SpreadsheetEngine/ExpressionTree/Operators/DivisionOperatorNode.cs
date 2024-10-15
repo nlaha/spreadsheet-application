@@ -13,7 +13,7 @@ namespace SpreadsheetEngine.ExpressionTree.Operators
         public override EAssociativity Associativity => EAssociativity.Left;
 
         /// <inheritdoc/>
-        public override int Precedence => 0;
+        public override int Precedence => 1;
 
         /// <inheritdoc/>
         internal override double Evaluate()

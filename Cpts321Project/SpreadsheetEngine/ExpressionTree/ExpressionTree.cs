@@ -4,11 +4,6 @@
 
 namespace SpreadsheetEngine.ExpressionTree
 {
-    using System.Collections;
-    using System.Linq.Expressions;
-    using System.Text;
-    using System.Text.RegularExpressions;
-    using SpreadsheetEngine.Attributes;
     using SpreadsheetEngine.Exceptions;
     using SpreadsheetEngine.ExpressionTree.Interfaces;
 
@@ -31,16 +26,50 @@ namespace SpreadsheetEngine.ExpressionTree
         /// <summary>
         /// Initializes a new instance of the <see cref="ExpressionTree"/> class.
         /// </summary>
+        public ExpressionTree()
+        {
+            this._expression = string.Empty;
+            this.Variables = new Dictionary<string, double>();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExpressionTree"/> class.
+        /// </summary>
         /// <param name="expression">the expression to generate the tree from</param>
         public ExpressionTree(string expression)
         {
-            this._expression = PerformShuntingYardAlgorithm(expression);
+            this._expression = expression;
             this.Variables = new Dictionary<string, double>();
 
-            foreach (char c in this._expression)
+            // construct tree from postfix expression
+            var stack = new Stack<Node>();
+            foreach (object obj in this.PerformShuntingYardAlgorithm(expression))
             {
+                if (obj is NodeVariable || obj is NodeNumericConstant)
+                {
+                    var node = obj as Node ??
+                        throw new InvalidExpressionTreeException("Invalid expression tree node");
 
+                    stack.Push(node);
+                }
+                else if (obj is NodeBinaryOperator op)
+                {
+                    if (stack.Count < 2)
+                    {
+                        throw new InvalidExpressionTreeException("Binary operators must have two operands");
+                    }
+                    op.Right = stack.Pop();
+                    op.Left = stack.Pop();
+                    stack.Push(op);
+                }
             }
+
+            if (stack.Count != 1)
+            {
+                throw new InvalidExpressionTreeException("Invalid expression tree");
+            }
+
+            this._tree = stack.Pop();
         }
 
         /// <summary>
@@ -80,9 +109,85 @@ namespace SpreadsheetEngine.ExpressionTree
         /// </summary>
         /// <param name="infixExpression">the infix expression</param>
         /// <returns>the postfix expression</returns>
-        private static string PerformShuntingYardAlgorithm(string infixExpression)
+        private List<object> PerformShuntingYardAlgorithm(string infixExpression)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrWhiteSpace(infixExpression))
+            {
+                throw new InvalidExpressionTreeException("Expression cannot be empty");
+            }
+
+            // temporary data structures
+            var output = new List<object>();
+            var stack = new Stack<object>();
+            var nextExpression = infixExpression;
+
+            while (true)
+            {
+                // process parentheses
+                char nextChar = nextExpression.FirstOrDefault();
+                if (nextChar == '(')
+                {
+                    stack.Push(nextChar);
+                    nextExpression = nextExpression[1..];
+                }
+                else if (nextChar == ')')
+                {
+                    // pop until we see a left parenthesis
+                    while (stack.Count > 0 && !(stack.Peek() is char c && c == '('))
+                    {
+                        output.Add(stack.Pop());
+                    }
+
+                    stack.Pop();
+                    nextExpression = nextExpression[1..];
+                }
+
+                // break if we have no more expression
+                if (string.IsNullOrWhiteSpace(nextExpression))
+                {
+                    break;
+                }
+
+                // process and create nodes
+                Node node;
+                nextExpression = NodeFactory.CreateNode(this.Variables, nextExpression, out node);
+
+                // process operators by precedence
+                if (node is NodeBinaryOperator op)
+                {
+                    var opPrevious = stack.Count > 0 ? stack.Peek() as NodeBinaryOperator : null;
+                    while (opPrevious != null && op.Precedence <= opPrevious.Precedence && op.Associativity == EAssociativity.Left)
+                    {
+                        output.Add(stack.Pop());
+                        opPrevious = stack.Count > 0 ? stack.Peek() as NodeBinaryOperator : null;
+                    }
+
+                    stack.Push(op);
+                }
+
+                // push operands to the output
+                else if (node is NodeVariable variable)
+                {
+                    output.Add(variable);
+                }
+                else if (node is NodeNumericConstant numeric)
+                {
+                    output.Add(numeric);
+                }
+            }
+
+            // pop remaining operators
+            while (stack.Count > 0)
+            {
+                if ((stack.Peek() as string) == "(")
+                {
+                    throw new InvalidExpressionTreeException("Mismatched parentheses");
+                }
+
+                output.Add(stack.Pop());
+            }
+
+            return output;
         }
     }
 }

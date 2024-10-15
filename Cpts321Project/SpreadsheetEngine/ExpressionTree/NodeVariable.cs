@@ -10,21 +10,21 @@ namespace SpreadsheetEngine.ExpressionTree
     /// <summary>
     /// Represents an expression tree variable node
     /// </summary>
-    internal class NodeVariable : Node, IMatchableExpressionNode
+    internal class NodeVariable : Node
     {
         /// <summary>
         /// Reference to parent expression tree instance
         /// </summary>
-        private readonly ExpressionTree _expressionTree;
+        private readonly Dictionary<string, double> _variables;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NodeVariable"/> class.
         /// </summary>
-        /// <param name="expressionTree">the parent expression tree</param>
+        /// <param name="variables">the parent expression tree variables dictionary</param>
         /// <param name="name">the variable name</param>
-        public NodeVariable(ExpressionTree expressionTree, string name)
+        public NodeVariable(Dictionary<string, double> variables, string name)
         {
-            this._expressionTree = expressionTree;
+            this._variables = variables;
             this.Name = name;
         }
 
@@ -41,9 +41,9 @@ namespace SpreadsheetEngine.ExpressionTree
         /// <inheritdoc/>
         internal override double Evaluate()
         {
-            if (this._expressionTree.Variables.ContainsKey(this.Name))
+            if (this._variables.ContainsKey(this.Name))
             {
-                return this._expressionTree.Variables[this.Name];
+                return this._variables[this.Name];
             }
             else
             {
