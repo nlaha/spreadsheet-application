@@ -120,9 +120,10 @@ namespace SpreadsheetEngine.ExpressionTree
 
             // remove excess parentheses
             // remove from beginning
-            infixExpression = Regex.Replace(infixExpression, "^[\\(\\)]+", "");
+            infixExpression = Regex.Replace(infixExpression, "^[\\(\\)]+", string.Empty);
+
             // remove from end
-            infixExpression = Regex.Replace(infixExpression, "[\\(\\)]+$", "");
+            infixExpression = Regex.Replace(infixExpression, "[\\(\\)]+$", string.Empty);
 
             // temporary data structures
             var output = new List<object>();
