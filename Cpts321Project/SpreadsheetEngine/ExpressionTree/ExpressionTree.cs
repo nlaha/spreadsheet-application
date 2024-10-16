@@ -114,17 +114,17 @@ namespace SpreadsheetEngine.ExpressionTree
         /// <returns>the postfix expression</returns>
         private List<object> PerformShuntingYardAlgorithm(string infixExpression)
         {
-            if (string.IsNullOrWhiteSpace(infixExpression))
-            {
-                throw new InvalidExpressionTreeException("Expression cannot be empty");
-            }
-
             // remove excess parentheses
             // remove from beginning
             infixExpression = Regex.Replace(infixExpression, "^[\\(\\)]+", string.Empty);
 
             // remove from end
             infixExpression = Regex.Replace(infixExpression, "[\\(\\)]+$", string.Empty);
+
+            if (string.IsNullOrWhiteSpace(infixExpression))
+            {
+                throw new InvalidExpressionTreeException("Expression cannot be empty");
+            }
 
             // temporary data structures
             var output = new List<object>();
