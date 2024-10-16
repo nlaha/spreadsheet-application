@@ -2,6 +2,8 @@
 // 11762135
 // </copyright>
 
+using System.Text.RegularExpressions;
+
 namespace SpreadsheetEngine.ExpressionTree
 {
     using SpreadsheetEngine.Exceptions;
@@ -115,6 +117,12 @@ namespace SpreadsheetEngine.ExpressionTree
             {
                 throw new InvalidExpressionTreeException("Expression cannot be empty");
             }
+
+            // remove excess parentheses
+            // remove from beginning
+            infixExpression = Regex.Replace(infixExpression, "^[\\(\\)]+", "");
+            // remove from end
+            infixExpression = Regex.Replace(infixExpression, "[\\(\\)]+$", "");
 
             // temporary data structures
             var output = new List<object>();
