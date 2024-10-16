@@ -60,6 +60,7 @@ namespace SpreadsheetEngine.ExpressionTree
                     {
                         throw new InvalidExpressionTreeException("Binary operators must have two operands");
                     }
+
                     op.Right = stack.Pop();
                     op.Left = stack.Pop();
                     stack.Push(op);

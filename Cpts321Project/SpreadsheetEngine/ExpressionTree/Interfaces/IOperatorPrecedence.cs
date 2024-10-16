@@ -7,7 +7,7 @@ namespace SpreadsheetEngine.ExpressionTree
     /// <summary>
     /// Interface for nodes that are operators
     /// </summary>
-    internal interface IOperatorNode
+    internal interface IOperatorPrecedence
     {
         /// <summary>
         /// Gets the precedence for this node, used when building the tree
