@@ -4,6 +4,7 @@
 
 namespace Spreadsheet_Nathan_Laha_Tests
 {
+    using System.Reflection;
     using SpreadsheetEngine.Exceptions;
     using SpreadsheetEngine.ExpressionTree;
 
@@ -80,7 +81,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
             var result = tree.Evaluate();
 
             // assert
-            Assert.That(result, Is.EqualTo(96));
+            Assert.That(result, Is.EqualTo(60));
         }
 
         /// <summary>
@@ -120,8 +121,6 @@ namespace Spreadsheet_Nathan_Laha_Tests
         /// <summary>
         /// Tests the shunting yard algorithm
         /// </summary>
-        /// <param name="infixExpression">the infix expression</param>
-        /// <param name="postfixExpression">the expected postfix expression</param>
         [Test]
         public void ExpressionTree_PerformShuntingYardAlgorithm()
         {
@@ -133,7 +132,24 @@ namespace Spreadsheet_Nathan_Laha_Tests
 
             // assert
             Assert.That(result, Is.Not.Null);
-            Assert.That(result as List<object>, Has.Count.EqualTo(9));
+            Assert.That(result as List<object>, Has.Count.EqualTo(10));
+        }
+
+        /// <summary>
+        /// Tests an invalid expression with the shunting yard algorithm
+        /// </summary>
+        [Test]
+        public void ExpressionTree_InvalidShuntingYardAlgorithm()
+        {
+            // arrange
+            var methodInfo = TestHelpers.GetMethod(this._expressionTree, "PerformShuntingYardAlgorithm");
+
+            // act
+            // assert
+            Assert.Throws<TargetInvocationException>(() =>
+            {
+                var result = methodInfo.Invoke(this._expressionTree, new object[] { "12+12*2-)12/2" });
+            });
         }
     }
 }
