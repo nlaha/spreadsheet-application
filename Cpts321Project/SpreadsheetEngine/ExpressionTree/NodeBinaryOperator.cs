@@ -29,5 +29,4 @@ namespace SpreadsheetEngine.ExpressionTree
         /// </summary>
         public Node? Right { get; set; } = null;
     }
-
 }
