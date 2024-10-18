@@ -28,7 +28,7 @@ namespace SpreadsheetEngine.ExpressionTree
         /// <summary>
         /// Gets node regex
         /// </summary>
-        public static string NodeRegex => @"\d+(\.+\d+)*";
+        public static string NodeRegex => @"^\d+(\.+\d+)*";
 
         /// <inheritdoc/>
         internal override double Evaluate()

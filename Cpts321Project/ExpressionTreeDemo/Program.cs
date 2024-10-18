@@ -6,7 +6,7 @@
     {
         static void Main(string[] args)
         {
-            ExpressionTree expressionTree = new ExpressionTree("");
+            ExpressionTree expressionTree = new ExpressionTree();
             string expression = "";
             int choice;
 

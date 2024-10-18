@@ -4,6 +4,7 @@
 
 namespace Spreadsheet_Nathan_Laha_Tests
 {
+    using System.Reflection;
     using SpreadsheetEngine.Exceptions;
     using SpreadsheetEngine.ExpressionTree;
 
@@ -13,59 +14,10 @@ namespace Spreadsheet_Nathan_Laha_Tests
     internal class ExpressionTreeTests
     {
         /// <summary>
-        /// Test binary operator evaluation
+        /// Expression tree instance
         /// </summary>
-        [Test]
-        public void NodeBinaryOperator_Evaluate()
-        {
-            // arrange
-            var lhs = new NodeNumericConstant("10.0");
-            var rhs = new NodeNumericConstant("5.0");
-            var node = new NodeBinaryOperator("+");
-
-            node.LhsChild = lhs;
-            node.RhsChild = rhs;
-
-            // act
-            var result = node.Evaluate();
-
-            // assert
-            Assert.That(result, Is.EqualTo(15.0));
-        }
-
-        /// <summary>
-        /// Tests variable nodes
-        /// </summary>
-        [Test]
-        public void NodeVariable_Evaluate()
-        {
-            // arrange
-            var expressionTree = new ExpressionTree(string.Empty);
-            expressionTree.SetVariable("test", 123.0);
-            var node = new NodeVariable(expressionTree, "test");
-
-            // act
-            var result = node.Evaluate();
-
-            // assert
-            Assert.That(result, Is.EqualTo(123.0));
-        }
-
-        /// <summary>
-        /// Tests numeric constant nodes
-        /// </summary>
-        [Test]
-        public void NodeNumericConstant_Evaluate()
-        {
-            // arrange
-            var node = new NodeNumericConstant("123.0");
-
-            // act
-            var result = node.Evaluate();
-
-            // assert
-            Assert.That(result, Is.EqualTo(123.0));
-        }
+        /// <remarks>This contains a dummy expression so it doesn't throw an exception</remarks>
+        private ExpressionTree _expressionTree = new ();
 
         /// <summary>
         /// Evaluate expression tree test
@@ -86,13 +38,15 @@ namespace Spreadsheet_Nathan_Laha_Tests
         /// <summary>
         /// Test invalid expression on expression tree
         /// </summary>
+        /// <param name="expression">the expression</param>
         [Test]
-        public void ExpressionTree_InvalidExpression()
+        [TestCase("12+(")]
+        [TestCase("")]
+        [TestCase("12(12")]
+        [TestCase("12+")]
+        public void ExpressionTree_InvalidExpressionParentheses(string expression)
         {
-            // arrange
-            var expression = "12+";
-
-            // act & assert
+            // arrange, act & assert
             Assert.Throws<InvalidExpressionTreeException>(() =>
             {
                 var expressionTree = new ExpressionTree(expression);
@@ -101,19 +55,47 @@ namespace Spreadsheet_Nathan_Laha_Tests
         }
 
         /// <summary>
-        /// Test a more complex expression
+        /// Tests a variety of expressions
         /// </summary>
+        /// <param name="expression">the expression</param>
+        /// <param name="expectedValue">the expected value</param>
         [Test]
-        public void ExpressionTree_ComplexExpression()
+        [TestCase("2+2", 4)]
+        [TestCase("2-2", 0)]
+        [TestCase("2*2", 4)]
+        [TestCase("2/2", 1)]
+        [TestCase("(3+4)/2", 3.5)]
+        [TestCase("2*(3+4)", 14)]
+        [TestCase("2*(3+4)/2", 7)]
+        [TestCase("2+3*3", 11)]
+        [TestCase("12+12*(2+2)", 60)]
+        [TestCase("12+12*2-2/2", 35)]
+        public void ExpressionTree_EvaluatesExpressionCorrectly(string expression, double expectedValue)
         {
             // arrange
-            var tree = new ExpressionTree("12+12+24");
+            var tree = new ExpressionTree(expression);
 
             // act
             var result = tree.Evaluate();
 
             // assert
-            Assert.That(result, Is.EqualTo(48));
+            Assert.That(result, Is.EqualTo(expectedValue));
+        }
+
+        /// <summary>
+        /// Test operator precedence with expression tree
+        /// </summary>
+        [Test]
+        public void ExpressionTree_TestPrecedence()
+        {
+            // arrange
+            var tree = new ExpressionTree("12-2*2");
+
+            // act
+            var result = tree.Evaluate();
+
+            // assert
+            Assert.That(result, Is.EqualTo(8));
         }
 
         /// <summary>
@@ -132,6 +114,41 @@ namespace Spreadsheet_Nathan_Laha_Tests
 
             // assert
             Assert.That(result, Is.EqualTo(29));
+        }
+
+        /// <summary>
+        /// Tests expression tree with variables on a complex expression
+        /// </summary>
+        [Test]
+        public void ExpressionTree_VariablesComplex()
+        {
+            // arrange
+            var tree = new ExpressionTree("(2+B4)*A2");
+            tree.SetVariable("B4", 2);
+            tree.SetVariable("A2", 3);
+
+            // act
+            var result = tree.Evaluate();
+
+            // assert
+            Assert.That(result, Is.EqualTo(12));
+        }
+
+        /// <summary>
+        /// Tests the shunting yard algorithm
+        /// </summary>
+        [Test]
+        public void ExpressionTree_PerformShuntingYardAlgorithm()
+        {
+            // arrange
+            var methodInfo = TestHelpers.GetMethod(this._expressionTree, "PerformShuntingYardAlgorithm");
+
+            // act
+            var result = methodInfo.Invoke(this._expressionTree, new object[] { "12+12*2-(12/2)" });
+
+            // assert
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result as List<object>, Has.Count.EqualTo(10));
         }
     }
 }
