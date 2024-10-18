@@ -148,7 +148,6 @@ namespace SpreadsheetEngine.ExpressionTree
                         output.Add(stack.Pop());
                     }
 
-                    stack.Pop();
                     nextExpression = nextExpression[1..];
                 }
 

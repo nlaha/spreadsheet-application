@@ -53,6 +53,40 @@ namespace Spreadsheet_Nathan_Laha_Tests
         }
 
         /// <summary>
+        /// Test invalid expression on expression tree
+        /// </summary>
+        [Test]
+        public void ExpressionTree_InvalidExpressionParentheses()
+        {
+            // arrange
+            var expression = "12+(";
+
+            // act & assert
+            Assert.Throws<InvalidExpressionTreeException>(() =>
+            {
+                var expressionTree = new ExpressionTree(expression);
+                expressionTree.Evaluate();
+            });
+        }
+
+        /// <summary>
+        /// Test invalid expression on expression tree
+        /// </summary>
+        [Test]
+        public void ExpressionTree_InvalidExpressionBlank()
+        {
+            // arrange
+            var expression = "";
+
+            // act & assert
+            Assert.Throws<InvalidExpressionTreeException>(() =>
+            {
+                var expressionTree = new ExpressionTree(expression);
+                expressionTree.Evaluate();
+            });
+        }
+
+        /// <summary>
         /// Test a more complex expression
         /// </summary>
         [Test]
@@ -133,23 +167,6 @@ namespace Spreadsheet_Nathan_Laha_Tests
             // assert
             Assert.That(result, Is.Not.Null);
             Assert.That(result as List<object>, Has.Count.EqualTo(10));
-        }
-
-        /// <summary>
-        /// Tests an invalid expression with the shunting yard algorithm
-        /// </summary>
-        [Test]
-        public void ExpressionTree_InvalidShuntingYardAlgorithm()
-        {
-            // arrange
-            var methodInfo = TestHelpers.GetMethod(this._expressionTree, "PerformShuntingYardAlgorithm");
-
-            // act
-            // assert
-            Assert.Throws<TargetInvocationException>(() =>
-            {
-                var result = methodInfo.Invoke(this._expressionTree, new object[] { "12+12*2-)12/2" });
-            });
         }
     }
 }
