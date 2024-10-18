@@ -38,13 +38,15 @@ namespace Spreadsheet_Nathan_Laha_Tests
         /// <summary>
         /// Test invalid expression on expression tree
         /// </summary>
+        /// <param name="expression">the expression</param>
         [Test]
-        public void ExpressionTree_InvalidExpression()
+        [TestCase("12+(")]
+        [TestCase("")]
+        [TestCase("12(12")]
+        [TestCase("12+")]
+        public void ExpressionTree_InvalidExpressionParentheses(string expression)
         {
-            // arrange
-            var expression = "12+";
-
-            // act & assert
+            // arrange, act & assert
             Assert.Throws<InvalidExpressionTreeException>(() =>
             {
                 var expressionTree = new ExpressionTree(expression);
@@ -53,69 +55,31 @@ namespace Spreadsheet_Nathan_Laha_Tests
         }
 
         /// <summary>
-        /// Test invalid expression on expression tree
+        /// Tests a variety of expressions
         /// </summary>
+        /// <param name="expression">the expression</param>
+        /// <param name="expectedValue">the expected value</param>
         [Test]
-        public void ExpressionTree_InvalidExpressionParentheses()
+        [TestCase("2+2", 4)]
+        [TestCase("2-2", 0)]
+        [TestCase("2*2", 4)]
+        [TestCase("2/2", 1)]
+        [TestCase("(3+4)/2", 3.5)]
+        [TestCase("2*(3+4)", 14)]
+        [TestCase("2*(3+4)/2", 7)]
+        [TestCase("2+3*3", 11)]
+        [TestCase("12+12*(2+2)", 60)]
+        [TestCase("12+12*2-2/2", 35)]
+        public void ExpressionTree_EvaluatesExpressionCorrectly(string expression, double expectedValue)
         {
             // arrange
-            var expression = "12+(";
-
-            // act & assert
-            Assert.Throws<InvalidExpressionTreeException>(() =>
-            {
-                var expressionTree = new ExpressionTree(expression);
-                expressionTree.Evaluate();
-            });
-        }
-
-        /// <summary>
-        /// Test invalid expression on expression tree
-        /// </summary>
-        [Test]
-        public void ExpressionTree_InvalidExpressionBlank()
-        {
-            // arrange
-            var expression = "";
-
-            // act & assert
-            Assert.Throws<InvalidExpressionTreeException>(() =>
-            {
-                var expressionTree = new ExpressionTree(expression);
-                expressionTree.Evaluate();
-            });
-        }
-
-        /// <summary>
-        /// Test a more complex expression
-        /// </summary>
-        [Test]
-        public void ExpressionTree_ComplexExpression()
-        {
-            // arrange
-            var tree = new ExpressionTree("12+12+24");
+            var tree = new ExpressionTree(expression);
 
             // act
             var result = tree.Evaluate();
 
             // assert
-            Assert.That(result, Is.EqualTo(48));
-        }
-
-        /// <summary>
-        /// Test a more complex expression with parentheses
-        /// </summary>
-        [Test]
-        public void ExpressionTree_ComplexExpressionParentheses()
-        {
-            // arrange
-            var tree = new ExpressionTree("12+12*(2+2)");
-
-            // act
-            var result = tree.Evaluate();
-
-            // assert
-            Assert.That(result, Is.EqualTo(60));
+            Assert.That(result, Is.EqualTo(expectedValue));
         }
 
         /// <summary>
@@ -150,6 +114,24 @@ namespace Spreadsheet_Nathan_Laha_Tests
 
             // assert
             Assert.That(result, Is.EqualTo(29));
+        }
+
+        /// <summary>
+        /// Tests expression tree with variables on a complex expression
+        /// </summary>
+        [Test]
+        public void ExpressionTree_VariablesComplex()
+        {
+            // arrange
+            var tree = new ExpressionTree("(2+B4)*A2");
+            tree.SetVariable("B4", 2);
+            tree.SetVariable("A2", 3);
+
+            // act
+            var result = tree.Evaluate();
+
+            // assert
+            Assert.That(result, Is.EqualTo(12));
         }
 
         /// <summary>

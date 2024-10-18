@@ -31,7 +31,7 @@ namespace SpreadsheetEngine.ExpressionTree
         /// <summary>
         /// Gets node regex
         /// </summary>
-        public static string NodeRegex => @"[A-Za-z]\w+";
+        public static string NodeRegex => @"^[A-Za-z]\w+";
 
         /// <summary>
         /// Gets or sets the variable name
