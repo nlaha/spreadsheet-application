@@ -4,6 +4,7 @@
 
 namespace Spreadsheet_Nathan_Laha_Tests
 {
+    using System.Linq.Expressions;
     using System.Reflection;
     using SpreadsheetEngine.Exceptions;
     using SpreadsheetEngine.ExpressionTree;
@@ -70,6 +71,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
         [TestCase("2+3*3", 11)]
         [TestCase("12+12*(2+2)", 60)]
         [TestCase("12+12*2-2/2", 35)]
+        [TestCase("1+(1+(1+1))", 4)]
         public void ExpressionTree_EvaluatesExpressionCorrectly(string expression, double expectedValue)
         {
             // arrange
@@ -150,5 +152,21 @@ namespace Spreadsheet_Nathan_Laha_Tests
             Assert.That(result, Is.Not.Null);
             Assert.That(result as List<object>, Has.Count.EqualTo(10));
         }
+
+        /// <summary>
+        /// Tests an expression with lots of parentheses
+        /// </summary>
+        [Test]
+        public void ExpressionTree_TestLotsOfParentheses()
+        {
+            // arrange
+            // act
+            var expression = new ExpressionTree("(((3+3)+(2+4)))");
+            var res = expression.Evaluate();
+
+            // assert
+            Assert.That(res, Is.EqualTo(12));
+        }
+
     }
 }
