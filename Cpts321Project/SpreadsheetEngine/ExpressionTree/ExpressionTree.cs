@@ -20,14 +20,19 @@ namespace SpreadsheetEngine.ExpressionTree
         private readonly string _expression;
 
         /// <summary>
-        /// The root node of the expression tree
-        /// </summary>
-        private readonly Node? _tree;
-
-        /// <summary>
         /// The node factory instance used to create nodes
         /// </summary>
         private readonly NodeFactory _nodeFactory;
+
+        /// <summary>
+        /// The root node of the expression tree
+        /// </summary>
+        private Node? _tree;
+
+        /// <summary>
+        /// Optional spreadsheet used for lookup up variables
+        /// </summary>
+        private Spreadsheet? _spreadsheet;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExpressionTree"/> class.
@@ -36,8 +41,6 @@ namespace SpreadsheetEngine.ExpressionTree
         {
             this._expression = string.Empty;
             this._nodeFactory = new NodeFactory();
-
-            this.Variables = new Dictionary<string, double>();
         }
 
         /// <summary>
@@ -48,9 +51,76 @@ namespace SpreadsheetEngine.ExpressionTree
         {
             this._expression = expression;
             this._nodeFactory = new NodeFactory();
+            this.ConstructTree(expression);
+        }
 
-            this.Variables = new Dictionary<string, double>();
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExpressionTree"/> class.
+        /// </summary>
+        /// <param name="expression">expression</param>
+        /// <param name="spreadsheet">spreadsheet used for looking up variable values</param>
+        public ExpressionTree(string expression, Spreadsheet spreadsheet)
+        {
+            this._expression = expression;
+            this._nodeFactory = new NodeFactory();
+            this._spreadsheet = spreadsheet;
+            this.ConstructTree(expression);
+        }
 
+        /// <summary>
+        /// Evaluate the expression tree value
+        /// </summary>
+        /// <returns>the evaluated value</returns>
+        public double Evaluate()
+        {
+            if (this._tree != null)
+            {
+                return this._tree.Evaluate();
+            }
+            else
+            {
+                throw new InvalidExpressionTreeException("Expression tree is empty");
+            }
+        }
+
+        /// <summary>
+        /// Gets the value of a variable from the spreadsheet if it exists
+        /// </summary>
+        /// <param name="variableName">the variable name, i.e. A2</param>
+        /// <returns>the value</returns>
+        /// <exception cref="InvalidExpressionTreeException">thrown when the varible could not be found or is invalid</exception>
+        public double GetVariableValue(string variableName)
+        {
+            if (this._spreadsheet != null)
+            {
+                var cell = this._spreadsheet.GetCellByName(variableName);
+                if (cell == null)
+                {
+                    throw new InvalidExpressionTreeException($"Referenced variable: \"{variableName}\" cannot be found!");
+                }
+
+                double value;
+                var success = double.TryParse(cell.Value, out value);
+                if (!success)
+                {
+                    throw new InvalidExpressionTreeException($"Referenced variable is not numeric");
+                }
+
+                return value;
+            }
+            else
+            {
+                throw new InvalidExpressionTreeException("Spreadsheet is not set but variables were referenced");
+            }
+        }
+
+        /// <summary>
+        /// Constructs the expression tree from the expression
+        /// </summary>
+        /// <param name="expression">expression</param>
+        /// <exception cref="InvalidExpressionTreeException">thrown when the expression is invalid</exception>
+        private void ConstructTree(string expression)
+        {
             // construct tree from postfix expression
             var stack = new Stack<Node>();
             foreach (object obj in this.PerformShuntingYardAlgorithm(expression))
@@ -81,37 +151,6 @@ namespace SpreadsheetEngine.ExpressionTree
             }
 
             this._tree = stack.Pop();
-        }
-
-        /// <summary>
-        /// Gets dictionary of variables for this expression
-        /// </summary>
-        public Dictionary<string, double> Variables { get; }
-
-        /// <summary>
-        /// Sets the specified variable within the expression tree variables dictionary
-        /// </summary>
-        /// <param name="variableName">the name of the variable</param>
-        /// <param name="variableValue">the variable value</param>
-        public void SetVariable(string variableName, double variableValue)
-        {
-            this.Variables[variableName] = variableValue;
-        }
-
-        /// <summary>
-        /// Evaluate the expression tree value
-        /// </summary>
-        /// <returns>the evaluated value</returns>
-        public double Evaluate()
-        {
-            if (this._tree != null)
-            {
-                return this._tree.Evaluate();
-            }
-            else
-            {
-                throw new InvalidExpressionTreeException("Expression tree is empty");
-            }
         }
 
         /// <summary>
@@ -179,7 +218,7 @@ namespace SpreadsheetEngine.ExpressionTree
 
                 // process and create nodes
                 Node node;
-                nextExpression = this._nodeFactory.CreateNode(this.Variables, nextExpression, out node);
+                nextExpression = this._nodeFactory.CreateNode(this.GetVariableValue, nextExpression, out node);
 
                 // process operators by precedence and associativity
                 if (node is NodeBinaryOperator op)

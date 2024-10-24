@@ -41,6 +41,8 @@
             dataGrid.Name = "dataGrid";
             dataGrid.Size = new Size(800, 450);
             dataGrid.TabIndex = 0;
+            dataGrid.CellBeginEdit += OnCellBeginEdit;
+            dataGrid.CellEndEdit += OnCellEndEdit;
             // 
             // demoButton
             // 

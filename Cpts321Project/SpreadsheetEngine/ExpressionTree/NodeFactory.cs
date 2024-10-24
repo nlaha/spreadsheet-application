@@ -61,11 +61,11 @@ namespace SpreadsheetEngine.ExpressionTree
         /// <summary>
         /// Creates a node from a string token
         /// </summary>
-        /// <param name="variables">the parent expression tree's variables dictionary</param>
+        /// <param name="variableGetter">the variable getter function used to lookup variable values</param>
         /// <param name="expression">the expression</param>
         /// <param name="node">the created node</param>
         /// <returns>the expression minus the tokens used to create the node</returns>
-        public string CreateNode(Dictionary<string, double> variables, string expression, out Node node)
+        public string CreateNode(Func<string, double> variableGetter, string expression, out Node node)
         {
             // make operator node
             try
@@ -85,7 +85,7 @@ namespace SpreadsheetEngine.ExpressionTree
                 var variableMatch = Regex.Match(expression, NodeVariable.NodeRegex);
                 if (variableMatch.Success)
                 {
-                    node = new NodeVariable(variables, variableMatch.Value);
+                    node = new NodeVariable(variableGetter, variableMatch.Value);
 
                     // skip the variable name
                     return expression[variableMatch.Length..];

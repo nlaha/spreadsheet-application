@@ -22,6 +22,6 @@ namespace SpreadsheetEngine.ExpressionTree
         /// <summary>
         /// Right -> left associativity
         /// </summary>
-        Right
+        Right,
     }
 }
