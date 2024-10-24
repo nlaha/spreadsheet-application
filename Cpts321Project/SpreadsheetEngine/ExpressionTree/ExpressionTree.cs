@@ -51,6 +51,18 @@ namespace SpreadsheetEngine.ExpressionTree
         }
 
         /// <summary>
+        /// Finalizes an instance of the <see cref="ExpressionTree"/> class.
+        /// </summary>
+        ~ExpressionTree()
+        {
+            // unsubscribe from events
+            foreach (var cell in this._referencedCells)
+            {
+                cell.PropertyChanged -= this.OnReferencedCellPropertyChanged;
+            }
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ExpressionTree"/> class.
         /// </summary>
         /// <param name="expression">the expression to generate the tree from</param>
@@ -119,7 +131,7 @@ namespace SpreadsheetEngine.ExpressionTree
                 var success = double.TryParse(cell.Value, out value);
                 if (!success)
                 {
-                    throw new InvalidExpressionTreeException($"Referenced variable is not numeric");
+                    throw new InvalidExpressionTreeException($"Referenced variable \"{variableName}\" is not numeric");
                 }
 
                 return value;

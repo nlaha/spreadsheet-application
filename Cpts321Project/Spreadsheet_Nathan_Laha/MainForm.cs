@@ -9,6 +9,7 @@ namespace Spreadsheet_Nathan_Laha
     using System.Reflection;
     using System.Windows.Forms;
     using SpreadsheetEngine;
+    using SpreadsheetEngine.Exceptions;
 
     /// <summary>
     /// The main form class for the main window
@@ -121,10 +122,18 @@ namespace Spreadsheet_Nathan_Laha
             var dataGridCell = this.GetDataGridCell(e.ColumnIndex, e.RowIndex);
 
             // update cell text
-            cell.Text = dataGridCell.Value?.ToString() ?? string.Empty;
+            try
+            {
+                cell.Text = dataGridCell.Value?.ToString() ?? string.Empty;
 
-            // set display back to value mode
-            this.dataGrid.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = cell.Value;
+                // set display back to value mode
+                dataGridCell.Value = cell.Value;
+            }
+            catch (InvalidExpressionTreeException exception)
+            {
+                dataGridCell.Value = "ERR";
+                MessageBox.Show(exception.Message ?? "Unknown Error", "Invalid Expression", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         /// <summary>
