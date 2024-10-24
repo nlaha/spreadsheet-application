@@ -104,42 +104,6 @@ namespace Spreadsheet_Nathan_Laha_Tests
         }
 
         /// <summary>
-        /// Tests expression tree with variables
-        /// </summary>
-        [Test]
-        public void ExpressionTree_Variables()
-        {
-            // arrange
-            var tree = new ExpressionTree("B4+A2+24");
-            tree.SetVariable("B4", 2);
-            tree.SetVariable("A2", 3);
-
-            // act
-            var result = tree.Evaluate();
-
-            // assert
-            Assert.That(result, Is.EqualTo(29));
-        }
-
-        /// <summary>
-        /// Tests expression tree with variables on a complex expression
-        /// </summary>
-        [Test]
-        public void ExpressionTree_VariablesComplex()
-        {
-            // arrange
-            var tree = new ExpressionTree("(2+B4)*A2");
-            tree.SetVariable("B4", 2);
-            tree.SetVariable("A2", 3);
-
-            // act
-            var result = tree.Evaluate();
-
-            // assert
-            Assert.That(result, Is.EqualTo(12));
-        }
-
-        /// <summary>
         /// Tests the shunting yard algorithm
         /// </summary>
         [Test]

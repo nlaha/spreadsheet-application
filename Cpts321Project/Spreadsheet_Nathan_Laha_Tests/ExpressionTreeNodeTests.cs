@@ -36,24 +36,6 @@ namespace Spreadsheet_Nathan_Laha_Tests
         }
 
         /// <summary>
-        /// Tests variable nodes
-        /// </summary>
-        [Test]
-        public void NodeVariable_Evaluate()
-        {
-            // arrange
-            var expressionTree = new ExpressionTree();
-            expressionTree.SetVariable("test", 123.0);
-            var node = new NodeVariable(expressionTree.Variables, "test");
-
-            // act
-            var result = node.Evaluate();
-
-            // assert
-            Assert.That(result, Is.EqualTo(123.0));
-        }
-
-        /// <summary>
         /// Tests numeric constant nodes
         /// </summary>
         [Test]

@@ -55,7 +55,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
             // act
             var node = null as Node;
             var nodeFactory = new NodeFactory();
-            var str = nodeFactory.CreateNode(new Dictionary<string, double> { }, expression, out node);
+            var str = nodeFactory.CreateNode((name) => { return 0.0; }, expression, out node);
 
             // assert
             Assert.That(node, Is.Not.Null);
@@ -80,7 +80,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
             var nodeFactory = new NodeFactory();
             Assert.Throws<InvalidExpressionTreeException>(() =>
             {
-                nodeFactory.CreateNode(new Dictionary<string, double> { }, expression, out node);
+                nodeFactory.CreateNode((name) => { return 0.0; }, expression, out node);
             });
         }
     }
