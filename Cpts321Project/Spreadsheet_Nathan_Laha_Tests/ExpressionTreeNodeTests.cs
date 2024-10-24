@@ -19,7 +19,8 @@ namespace Spreadsheet_Nathan_Laha_Tests
             // arrange
             var lhs = new NodeNumericConstant("10.0");
             var rhs = new NodeNumericConstant("5.0");
-            var node = NodeFactory.CreateBinaryOperator('+');
+            var nodeFactory = new NodeFactory();
+            var node = nodeFactory.CreateBinaryOperator('+');
 
             // extra assert
             Assert.That(node, Is.Not.Null);

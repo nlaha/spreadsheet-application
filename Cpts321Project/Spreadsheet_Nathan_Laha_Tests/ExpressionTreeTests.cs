@@ -150,7 +150,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
 
             // assert
             Assert.That(result, Is.Not.Null);
-            Assert.That(result as List<object>, Has.Count.EqualTo(10));
+            Assert.That(result as List<object>, Has.Count.EqualTo(9));
         }
 
         /// <summary>
@@ -167,6 +167,5 @@ namespace Spreadsheet_Nathan_Laha_Tests
             // assert
             Assert.That(res, Is.EqualTo(12));
         }
-
     }
 }

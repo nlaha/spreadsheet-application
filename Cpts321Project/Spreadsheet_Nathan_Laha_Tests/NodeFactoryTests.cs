@@ -27,7 +27,8 @@ namespace Spreadsheet_Nathan_Laha_Tests
         {
             // arrange
             // act
-            var node = NodeFactory.CreateBinaryOperator(op);
+            var nodeFactory = new NodeFactory();
+            var node = nodeFactory.CreateBinaryOperator(op);
 
             // assert
             Assert.That(node, Is.Not.Null);
@@ -52,7 +53,8 @@ namespace Spreadsheet_Nathan_Laha_Tests
             // arrange
             // act
             var node = null as Node;
-            var str = NodeFactory.CreateNode(new Dictionary<string, double> { }, expression, out node);
+            var nodeFactory = new NodeFactory();
+            var str = nodeFactory.CreateNode(new Dictionary<string, double> { }, expression, out node);
 
             // assert
             Assert.That(node, Is.Not.Null);
@@ -74,9 +76,10 @@ namespace Spreadsheet_Nathan_Laha_Tests
             // act
             // assert
             var node = null as Node;
+            var nodeFactory = new NodeFactory();
             Assert.Throws<InvalidExpressionTreeException>(() =>
             {
-                NodeFactory.CreateNode(new Dictionary<string, double> { }, expression, out node);
+                nodeFactory.CreateNode(new Dictionary<string, double> { }, expression, out node);
             });
         }
     }

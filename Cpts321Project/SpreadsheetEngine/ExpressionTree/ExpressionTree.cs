@@ -2,10 +2,9 @@
 // 11762135
 // </copyright>
 
-using System.Text.RegularExpressions;
-
 namespace SpreadsheetEngine.ExpressionTree
 {
+    using System.Text.RegularExpressions;
     using SpreadsheetEngine.Exceptions;
     using SpreadsheetEngine.ExpressionTree.Interfaces;
 
@@ -26,11 +25,18 @@ namespace SpreadsheetEngine.ExpressionTree
         private readonly Node? _tree;
 
         /// <summary>
+        /// The node factory instance used to create nodes
+        /// </summary>
+        private readonly NodeFactory _nodeFactory;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ExpressionTree"/> class.
         /// </summary>
         public ExpressionTree()
         {
             this._expression = string.Empty;
+            this._nodeFactory = new NodeFactory();
+
             this.Variables = new Dictionary<string, double>();
         }
 
@@ -41,6 +47,8 @@ namespace SpreadsheetEngine.ExpressionTree
         public ExpressionTree(string expression)
         {
             this._expression = expression;
+            this._nodeFactory = new NodeFactory();
+
             this.Variables = new Dictionary<string, double>();
 
             // construct tree from postfix expression
@@ -114,13 +122,6 @@ namespace SpreadsheetEngine.ExpressionTree
         /// <returns>the postfix expression</returns>
         private List<object> PerformShuntingYardAlgorithm(string infixExpression)
         {
-            // remove excess parentheses
-            // remove from beginning
-            infixExpression = Regex.Replace(infixExpression, "^[\\(\\)]+", string.Empty);
-
-            // remove from end
-            infixExpression = Regex.Replace(infixExpression, "[\\(\\)]+$", string.Empty);
-
             if (string.IsNullOrWhiteSpace(infixExpression))
             {
                 throw new InvalidExpressionTreeException("Expression cannot be empty");
@@ -133,22 +134,41 @@ namespace SpreadsheetEngine.ExpressionTree
 
             while (true)
             {
-                // process parentheses
                 char nextChar = nextExpression.FirstOrDefault();
-                if (nextChar == '(')
+
+                // skip spaces
+                if (nextChar == ' ')
+                {
+                    nextExpression = nextExpression[1..];
+                    continue;
+                }
+
+                // process open parentheses
+                while (nextChar == '(')
                 {
                     stack.Push(nextChar);
                     nextExpression = nextExpression[1..];
+                    nextChar = nextExpression.FirstOrDefault();
                 }
-                else if (nextChar == ')')
+
+                // process close parentheses
+                while (nextChar == ')')
                 {
+                    // Extra parentheses
+                    if (stack.Count == 0)
+                    {
+                        break;
+                    }
+
                     // pop until we see a left parenthesis
-                    while (stack.Count > 0 && !(stack.Peek() is char c && c == '('))
+                    while (stack.Count > 1 && !(stack.Peek() is char c && c == '('))
                     {
                         output.Add(stack.Pop());
                     }
 
+                    stack.Pop();
                     nextExpression = nextExpression[1..];
+                    nextChar = nextExpression.FirstOrDefault();
                 }
 
                 // break if we have no more expression
@@ -159,9 +179,9 @@ namespace SpreadsheetEngine.ExpressionTree
 
                 // process and create nodes
                 Node node;
-                nextExpression = NodeFactory.CreateNode(this.Variables, nextExpression, out node);
+                nextExpression = this._nodeFactory.CreateNode(this.Variables, nextExpression, out node);
 
-                // process operators by precedence
+                // process operators by precedence and associativity
                 if (node is NodeBinaryOperator op)
                 {
                     var opPrevious = stack.Count > 0 ? stack.Peek() as NodeBinaryOperator : null;
@@ -188,9 +208,10 @@ namespace SpreadsheetEngine.ExpressionTree
             // pop remaining operators
             while (stack.Count > 0)
             {
-                if ((stack.Peek() as string) == "(")
+                // pop any left-hand parentheses that are left over
+                if (stack.Peek() as char? == '(')
                 {
-                    throw new InvalidExpressionTreeException("Mismatched parentheses");
+                    throw new InvalidExpressionTreeException("Mismatched Parentheses");
                 }
 
                 output.Add(stack.Pop());
