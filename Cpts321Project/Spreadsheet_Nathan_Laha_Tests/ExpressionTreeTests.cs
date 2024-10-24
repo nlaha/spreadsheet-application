@@ -174,7 +174,6 @@ namespace Spreadsheet_Nathan_Laha_Tests
             var expression = new ExpressionTree(cell, spreadsheet);
 
             // act & assert
-
             Assert.Throws<InvalidExpressionTreeException>(() =>
             {
                 expression.Evaluate();
