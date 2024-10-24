@@ -143,8 +143,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
         {
             // arrange
             Spreadsheet spreadsheet = new Spreadsheet(50, 50);
-            TextCell cell = new TextCell(0, 0);
-            cell.Text = "=A3+A2+2";
+            TextCell cell = new TextCell(0, 0, "=A3+A2+2");
 
             spreadsheet.SetCellValue(0, 2, "1");
             spreadsheet.SetCellValue(0, 1, "1");
@@ -165,8 +164,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
         {
             // arrange
             Spreadsheet spreadsheet = new Spreadsheet(50, 50);
-            TextCell cell = new TextCell(0, 0);
-            cell.Text = "=A3+A2+2";
+            TextCell cell = new TextCell(0, 0, "=A3+A2+2");
 
             spreadsheet.SetCellValue(0, 2, "hello");
             spreadsheet.SetCellValue(0, 1, "1");

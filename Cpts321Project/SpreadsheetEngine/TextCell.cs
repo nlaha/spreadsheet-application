@@ -14,9 +14,17 @@ namespace SpreadsheetEngine
         /// </summary>
         /// <param name="columnIndex">the column index</param>
         /// <param name="rowIndex">the row index</param>
-        public TextCell(int columnIndex, int rowIndex)
+        /// <param name="text">the text for the cell</param>
+        public TextCell(int columnIndex, int rowIndex, string text)
             : base(columnIndex, rowIndex)
         {
+            this.Text = text;
+        }
+
+        /// <inheritdoc/>
+        public override string Value
+        {
+            get => this.Text;
         }
     }
 }

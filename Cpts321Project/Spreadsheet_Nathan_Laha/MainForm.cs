@@ -22,11 +22,6 @@ namespace Spreadsheet_Nathan_Laha
         private Spreadsheet _spreadsheet;
 
         /// <summary>
-        /// Are we currently editing a cell?
-        /// </summary>
-        private bool _isEditing;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="MainForm"/> class.
         /// </summary>
         public MainForm()
@@ -87,10 +82,15 @@ namespace Spreadsheet_Nathan_Laha
                 throw new ArgumentNullException(nameof(cell));
             }
 
-            // don't update UI cell contents if we're currently editing
-            if (!this._isEditing)
+            var dataGridCell = this.GetDataGridCell(cell.ColumnIndex, cell.RowIndex);
+            try
             {
-                this.GetDataGridCell(cell.ColumnIndex, cell.RowIndex).Value = cell.Value;
+                dataGridCell.Value = cell.Value;
+                dataGridCell.ErrorText = string.Empty;
+            }
+            catch (InvalidExpressionTreeException exception)
+            {
+                dataGridCell.ErrorText = exception.Message;
             }
         }
 
@@ -102,11 +102,10 @@ namespace Spreadsheet_Nathan_Laha
         private void OnCellBeginEdit(object? sender, DataGridViewCellCancelEventArgs e)
         {
             Cell? cell = this._spreadsheet.GetCell(e.ColumnIndex, e.RowIndex);
-
-            this._isEditing = true;
+            var dataGridCell = this.GetDataGridCell(e.ColumnIndex, e.RowIndex);
 
             // set display to text view mode
-            this.GetDataGridCell(e.ColumnIndex, e.RowIndex).Value = cell.Text;
+            dataGridCell.Value = cell.Text;
         }
 
         /// <summary>
@@ -117,23 +116,21 @@ namespace Spreadsheet_Nathan_Laha
         private void OnCellEndEdit(object? sender, DataGridViewCellEventArgs e)
         {
             Cell? cell = this._spreadsheet.GetCell(e.ColumnIndex, e.RowIndex);
-
-            this._isEditing = false;
             var dataGridCell = this.GetDataGridCell(e.ColumnIndex, e.RowIndex);
 
             // update cell text
             try
             {
                 cell.Text = dataGridCell.Value?.ToString() ?? string.Empty;
-
-                // set display back to value mode
-                dataGridCell.Value = cell.Value;
             }
             catch (InvalidExpressionTreeException exception)
             {
-                dataGridCell.Value = "ERR";
-                MessageBox.Show(exception.Message ?? "Unknown Error", "Invalid Expression", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                dataGridCell.ErrorText = exception.Message;
             }
+
+            // force a property change event, this way if we don't change the text at all
+            // we still get back into value display mode
+            cell.NotifyPropertyChanged();
         }
 
         /// <summary>

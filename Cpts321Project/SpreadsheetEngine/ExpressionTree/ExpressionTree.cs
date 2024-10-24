@@ -151,7 +151,6 @@ namespace SpreadsheetEngine.ExpressionTree
         {
             if (this._cell != null)
             {
-                this._cell.Value = this.Evaluate().ToString();
                 this._cell.NotifyPropertyChanged();
             }
         }

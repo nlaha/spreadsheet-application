@@ -67,7 +67,7 @@ namespace SpreadsheetEngine
         /// <summary>
         /// Gets or sets the computed value of the cell
         /// </summary>
-        public string Value
+        public virtual string Value
         {
             get => this._value;
             protected internal set
