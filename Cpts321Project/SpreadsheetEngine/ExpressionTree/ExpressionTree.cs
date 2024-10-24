@@ -14,7 +14,7 @@ namespace SpreadsheetEngine.ExpressionTree
     /// Represents an expression tree that will be evaluated to
     /// numeric values
     /// </summary>
-    public class ExpressionTree
+    internal class ExpressionTree
     {
         /// <summary>
         /// The cell that this expression tree references, optional

@@ -90,11 +90,27 @@ namespace SpreadsheetEngine
         }
 
         /// <summary>
+        /// Sets the text of a cell
+        /// </summary>
+        /// <param name="columnIndex">the column index</param>
+        /// <param name="rowIndex">the row index</param>
+        /// <param name="value">the value to set</param>
+        public void SetCellText(int columnIndex, int rowIndex, string value)
+        {
+            Cell? cell = this.GetCell(columnIndex, rowIndex);
+            if (cell != null)
+            {
+                cell.Text = value;
+            }
+        }
+
+        /// <summary>
         /// Gets a cell by it's name, i.e A1 or B23
         /// </summary>
         /// <param name="cellName">the cell's name string</param>
-        /// <returns>the cell, or null if not found</returns>
-        public Cell? GetCellByName(string cellName)
+        /// <returns>the cell</returns>
+        /// <exception cref="NullReferenceException">thrown when the cell name is invalid</exception>
+        public Cell GetCellByName(string cellName)
         {
             // skip the column
             string? rowIdxString = cellName[1..];
@@ -104,12 +120,11 @@ namespace SpreadsheetEngine
             bool rowParseSuccess = int.TryParse(rowIdxString, out rowIdx);
             if (!rowParseSuccess)
             {
-                return null;
+                throw new NullReferenceException($"Could not parse row index from {cellName}");
             }
 
             // get cell
-            Cell? refCell = this.GetCell(this.ColumnToIndex(cellName[0]), rowIdx - 1);
-            return refCell;
+            return this.GetCell(this.ColumnToIndex(cellName[0]), rowIdx - 1);
         }
 
         /// <summary>
