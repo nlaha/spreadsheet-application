@@ -157,15 +157,5 @@ namespace Spreadsheet_Nathan_Laha
             // make sure numbers are all visible
             dataGrid.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
         }
-
-        /// <summary>
-        /// Called when the demo button is clicked
-        /// </summary>
-        /// <param name="sender">the sender</param>
-        /// <param name="e">args</param>
-        private void DemoButton_Click(object sender, EventArgs e)
-        {
-            this._spreadsheet.PerformDemo();
-        }
     }
 }

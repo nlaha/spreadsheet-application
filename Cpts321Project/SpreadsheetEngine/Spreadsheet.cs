@@ -55,26 +55,6 @@ namespace SpreadsheetEngine
         public int RowCount { get => this.cells.GetLength(1); }
 
         /// <summary>
-        /// Performs the demo for HW4
-        /// </summary>
-        public void PerformDemo()
-        {
-            var random = new Random();
-            for (int i = 0; i < 100; i++)
-            {
-                this.cells[
-                    random.Next(0, this.ColumnCount - 1),
-                    random.Next(0, this.RowCount - 1)].Text = "Hello World!";
-            }
-
-            for (int i = 0; i < this.RowCount; i++)
-            {
-                this.cells[1, i].Text = $"This is cell B{i}";
-                this.cells[0, i].Text = $"=B{i}";
-            }
-        }
-
-        /// <summary>
         /// Gets the cell at the specified location
         /// </summary>
         /// <param name="columnIndex">the column index of the cell</param>
