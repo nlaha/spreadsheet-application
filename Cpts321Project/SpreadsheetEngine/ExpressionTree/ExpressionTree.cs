@@ -51,18 +51,6 @@ namespace SpreadsheetEngine.ExpressionTree
         }
 
         /// <summary>
-        /// Finalizes an instance of the <see cref="ExpressionTree"/> class.
-        /// </summary>
-        ~ExpressionTree()
-        {
-            // unsubscribe from events
-            foreach (var cell in this._referencedCells)
-            {
-                cell.PropertyChanged -= this.OnReferencedCellPropertyChanged;
-            }
-        }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ExpressionTree"/> class.
         /// </summary>
         /// <param name="expression">the expression to generate the tree from</param>
@@ -86,6 +74,18 @@ namespace SpreadsheetEngine.ExpressionTree
             this._spreadsheet = spreadsheet;
             this._referencedCells = new HashSet<Cell>();
             this.ConstructTree(cell.Text[1..]);
+        }
+
+        /// <summary>
+        /// Finalizes an instance of the <see cref="ExpressionTree"/> class.
+        /// </summary>
+        ~ExpressionTree()
+        {
+            // unsubscribe from events
+            foreach (var cell in this._referencedCells)
+            {
+                cell.PropertyChanged -= this.OnReferencedCellPropertyChanged;
+            }
         }
 
         /// <summary>
