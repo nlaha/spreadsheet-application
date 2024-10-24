@@ -6,6 +6,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
 {
     using System.Linq.Expressions;
     using System.Reflection;
+    using SpreadsheetEngine;
     using SpreadsheetEngine.Exceptions;
     using SpreadsheetEngine.ExpressionTree;
 
@@ -168,6 +169,23 @@ namespace Spreadsheet_Nathan_Laha_Tests
 
             // assert
             Assert.That(res, Is.EqualTo(12));
+        }
+
+        /// <summary>
+        /// Tests variable lookup from spreadsheet
+        /// </summary>
+        [Test]
+        public void ExpressionTree_TestVariableLookup()
+        {
+            // arrange
+            Spreadsheet spreadsheet = new Spreadsheet(50, 50);
+
+            // act
+            var expression = new ExpressionTree("A3+A2+2", spreadsheet);
+            var res = expression.Evaluate();
+
+            // assert
+            Assert.That(res, Is.EqualTo(2));
         }
     }
 }
