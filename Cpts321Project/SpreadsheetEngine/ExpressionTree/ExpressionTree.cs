@@ -4,6 +4,8 @@
 
 namespace SpreadsheetEngine.ExpressionTree
 {
+    using System;
+    using System.ComponentModel;
     using System.Text.RegularExpressions;
     using SpreadsheetEngine.Exceptions;
     using SpreadsheetEngine.ExpressionTree.Interfaces;
@@ -15,9 +17,14 @@ namespace SpreadsheetEngine.ExpressionTree
     public class ExpressionTree
     {
         /// <summary>
-        /// Current expression string
+        /// The cell that this expression tree references, optional
         /// </summary>
-        private readonly string _expression;
+        private readonly Cell? _cell;
+
+        /// <summary>
+        /// Set of cells this expression references
+        /// </summary>
+        private readonly HashSet<Cell> _referencedCells;
 
         /// <summary>
         /// The node factory instance used to create nodes
@@ -39,8 +46,8 @@ namespace SpreadsheetEngine.ExpressionTree
         /// </summary>
         public ExpressionTree()
         {
-            this._expression = string.Empty;
             this._nodeFactory = new NodeFactory();
+            this._referencedCells = new HashSet<Cell>();
         }
 
         /// <summary>
@@ -49,22 +56,24 @@ namespace SpreadsheetEngine.ExpressionTree
         /// <param name="expression">the expression to generate the tree from</param>
         public ExpressionTree(string expression)
         {
-            this._expression = expression;
             this._nodeFactory = new NodeFactory();
+            this._referencedCells = new HashSet<Cell>();
             this.ConstructTree(expression);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExpressionTree"/> class.
         /// </summary>
-        /// <param name="expression">expression</param>
+        /// <param name="cell">the cell containing the expression</param>
         /// <param name="spreadsheet">spreadsheet used for looking up variable values</param>
-        public ExpressionTree(string expression, Spreadsheet spreadsheet)
+        public ExpressionTree(Cell cell, Spreadsheet spreadsheet)
         {
-            this._expression = expression;
+            // skipping the '=' character
+            this._cell = cell;
             this._nodeFactory = new NodeFactory();
             this._spreadsheet = spreadsheet;
-            this.ConstructTree(expression);
+            this._referencedCells = new HashSet<Cell>();
+            this.ConstructTree(cell.Text[1..]);
         }
 
         /// <summary>
@@ -99,6 +108,13 @@ namespace SpreadsheetEngine.ExpressionTree
                     throw new InvalidExpressionTreeException($"Referenced variable: \"{variableName}\" cannot be found!");
                 }
 
+                this._referencedCells.Add(cell);
+
+                // When any of the referenced cells change, we want to re-evaluate the expression
+                // when we set the evaluated value back to the cell, it will trigger the cell's property changed event
+                // and will update the UI
+                cell.PropertyChanged += this.OnReferencedCellPropertyChanged;
+
                 double value;
                 var success = double.TryParse(cell.Value, out value);
                 if (!success)
@@ -111,6 +127,20 @@ namespace SpreadsheetEngine.ExpressionTree
             else
             {
                 throw new InvalidExpressionTreeException("Spreadsheet is not set but variables were referenced");
+            }
+        }
+
+        /// <summary>
+        /// Called when any of the referenced cells change
+        /// </summary>
+        /// <param name="sender">the referenced cell that changed</param>
+        /// <param name="e">the event args</param>
+        private void OnReferencedCellPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (this._cell != null)
+            {
+                this._cell.Value = this.Evaluate().ToString();
+                this._cell.NotifyPropertyChanged();
             }
         }
 

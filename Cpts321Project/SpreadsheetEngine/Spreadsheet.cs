@@ -140,7 +140,7 @@ namespace SpreadsheetEngine
                 }
                 else
                 {
-                    var expressionTree = new ExpressionTree.ExpressionTree(cell.Text[1..], this);
+                    var expressionTree = new ExpressionTree.ExpressionTree(cell, this);
                     cell.Value = expressionTree.Evaluate().ToString();
                 }
 
