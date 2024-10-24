@@ -143,13 +143,18 @@ namespace Spreadsheet_Nathan_Laha_Tests
         {
             // arrange
             Spreadsheet spreadsheet = new Spreadsheet(50, 50);
+            TextCell cell = new TextCell(0, 0);
+            cell.Text = "=A3+A2+2";
+
+            spreadsheet.SetCellValue(0, 2, "1");
+            spreadsheet.SetCellValue(0, 1, "1");
 
             // act
-            var expression = new ExpressionTree("A3+A2+2", spreadsheet);
+            var expression = new ExpressionTree(cell, spreadsheet);
             var res = expression.Evaluate();
 
             // assert
-            Assert.That(res, Is.EqualTo(2));
+            Assert.That(res, Is.EqualTo(4));
         }
     }
 }
