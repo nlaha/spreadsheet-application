@@ -156,5 +156,29 @@ namespace Spreadsheet_Nathan_Laha_Tests
             // assert
             Assert.That(res, Is.EqualTo(4));
         }
+
+        /// <summary>
+        /// Tests the expression tree with non-numeric variables
+        /// </summary>
+        [Test]
+        public void ExpressionTree_ThrowsNonNumericVariable()
+        {
+            // arrange
+            Spreadsheet spreadsheet = new Spreadsheet(50, 50);
+            TextCell cell = new TextCell(0, 0);
+            cell.Text = "=A3+A2+2";
+
+            spreadsheet.SetCellValue(0, 2, "hello");
+            spreadsheet.SetCellValue(0, 1, "1");
+
+            var expression = new ExpressionTree(cell, spreadsheet);
+
+            // act & assert
+
+            Assert.Throws<InvalidExpressionTreeException>(() =>
+            {
+                expression.Evaluate();
+            });
+        }
     }
 }
