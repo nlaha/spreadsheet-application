@@ -45,6 +45,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
         [TestCase("-", typeof(SubtractionOperatorNode))]
         [TestCase("*", typeof(MultiplicationOperatorNode))]
         [TestCase("/", typeof(DivisionOperatorNode))]
+        [TestCase("^", typeof(PowerOperatorNode))]
         [TestCase("test", typeof(NodeVariable))]
         [TestCase("20", typeof(NodeNumericConstant))]
         [TestCase("20.0", typeof(NodeNumericConstant))]

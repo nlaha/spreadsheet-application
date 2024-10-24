@@ -72,6 +72,8 @@ namespace Spreadsheet_Nathan_Laha_Tests
         [TestCase("12+12*(2+2)", 60)]
         [TestCase("12+12*2-2/2", 35)]
         [TestCase("1+(1+(1+1))", 4)]
+        [TestCase("2^2+4", 8)]
+        [TestCase("(2+2)^2", 16)]
         public void ExpressionTree_EvaluatesExpressionCorrectly(string expression, double expectedValue)
         {
             // arrange
