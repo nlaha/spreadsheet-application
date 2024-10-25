@@ -26,6 +26,8 @@ namespace Spreadsheet_Nathan_Laha_Tests
         public void NodeFactory_CreateBinaryOperator(char op, Type expectedType)
         {
             // arrange
+            var opInstance = Activator.CreateInstance(expectedType);
+            
             // act
             var nodeFactory = new NodeFactory();
             var node = nodeFactory.CreateBinaryOperator(op);
@@ -33,6 +35,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
             // assert
             Assert.That(node, Is.Not.Null);
             Assert.That(node.GetType(), Is.EqualTo(expectedType));
+            Assert.That(node.Precedence, Is.EqualTo(opInstance));
         }
 
         /// <summary>
