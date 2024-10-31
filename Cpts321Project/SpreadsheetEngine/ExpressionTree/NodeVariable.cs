@@ -15,16 +15,16 @@ namespace SpreadsheetEngine.ExpressionTree
         /// <summary>
         /// Reference to parent expression tree instance
         /// </summary>
-        private readonly Dictionary<string, double> _variables;
+        private readonly Func<string, double> _variableGetter;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NodeVariable"/> class.
         /// </summary>
-        /// <param name="variables">the parent expression tree variables dictionary</param>
+        /// <param name="variableGetter">the variable getter function used to lookup variable values</param>
         /// <param name="name">the variable name</param>
-        public NodeVariable(Dictionary<string, double> variables, string name)
+        public NodeVariable(Func<string, double> variableGetter, string name)
         {
-            this._variables = variables;
+            this._variableGetter = variableGetter;
             this.Name = name;
         }
 
@@ -41,14 +41,7 @@ namespace SpreadsheetEngine.ExpressionTree
         /// <inheritdoc/>
         internal override double Evaluate()
         {
-            if (this._variables.ContainsKey(this.Name))
-            {
-                return this._variables[this.Name];
-            }
-            else
-            {
-                throw new InvalidExpressionTreeException($"Referenced variable: \"{this.Name}\" cannot be found!");
-            }
+            return this._variableGetter.Invoke(this.Name);
         }
     }
 }

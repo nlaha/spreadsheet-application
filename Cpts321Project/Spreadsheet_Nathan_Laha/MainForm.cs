@@ -9,6 +9,7 @@ namespace Spreadsheet_Nathan_Laha
     using System.Reflection;
     using System.Windows.Forms;
     using SpreadsheetEngine;
+    using SpreadsheetEngine.Exceptions;
 
     /// <summary>
     /// The main form class for the main window
@@ -50,6 +51,24 @@ namespace Spreadsheet_Nathan_Laha
         }
 
         /// <summary>
+        /// Gets a cell in the data grid
+        /// </summary>
+        /// <param name="columnIndex">the column index</param>
+        /// <param name="rowIndex">the row index</param>
+        /// <returns>the cell</returns>
+        private DataGridViewCell GetDataGridCell(int columnIndex, int rowIndex)
+        {
+            // range check
+            if (columnIndex < 0 || columnIndex >= this.dataGrid.ColumnCount ||
+                rowIndex < 0 || rowIndex >= this.dataGrid.RowCount)
+            {
+                throw new NullReferenceException($"Could not find cell at {columnIndex}, {rowIndex}");
+            }
+
+            return this.dataGrid.Rows[rowIndex].Cells[columnIndex];
+        }
+
+        /// <summary>
         /// Called when something changes in a cell and we need to update it in the UI
         /// </summary>
         /// <param name="sender">the cell</param>
@@ -63,7 +82,55 @@ namespace Spreadsheet_Nathan_Laha
                 throw new ArgumentNullException(nameof(cell));
             }
 
-            this.dataGrid.Rows[cell.RowIndex].Cells[cell.ColumnIndex].Value = cell.Value;
+            var dataGridCell = this.GetDataGridCell(cell.ColumnIndex, cell.RowIndex);
+            try
+            {
+                dataGridCell.Value = cell.Value;
+                dataGridCell.ErrorText = string.Empty;
+            }
+            catch (InvalidExpressionTreeException exception)
+            {
+                dataGridCell.ErrorText = exception.Message;
+            }
+        }
+
+        /// <summary>
+        /// Callback for when a cell is put into editing mode by the user
+        /// </summary>
+        /// <param name="sender">the sender</param>
+        /// <param name="e">the args</param>
+        private void OnCellBeginEdit(object? sender, DataGridViewCellCancelEventArgs e)
+        {
+            Cell? cell = this._spreadsheet.GetCell(e.ColumnIndex, e.RowIndex);
+            var dataGridCell = this.GetDataGridCell(e.ColumnIndex, e.RowIndex);
+
+            // set display to text view mode
+            dataGridCell.Value = cell.Text;
+        }
+
+        /// <summary>
+        /// Callback for when a cell is no longer in editing mode
+        /// </summary>
+        /// <param name="sender">the sender</param>
+        /// <param name="e">the args</param>
+        private void OnCellEndEdit(object? sender, DataGridViewCellEventArgs e)
+        {
+            Cell? cell = this._spreadsheet.GetCell(e.ColumnIndex, e.RowIndex);
+            var dataGridCell = this.GetDataGridCell(e.ColumnIndex, e.RowIndex);
+
+            // update cell text
+            try
+            {
+                cell.Text = dataGridCell.Value?.ToString() ?? string.Empty;
+            }
+            catch (InvalidExpressionTreeException exception)
+            {
+                dataGridCell.ErrorText = exception.Message;
+            }
+
+            // force a property change event, this way if we don't change the text at all
+            // we still get back into value display mode
+            cell.NotifyPropertyChanged();
         }
 
         /// <summary>
@@ -95,16 +162,6 @@ namespace Spreadsheet_Nathan_Laha
 
             // make sure numbers are all visible
             dataGrid.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
-        }
-
-        /// <summary>
-        /// Called when the demo button is clicked
-        /// </summary>
-        /// <param name="sender">the sender</param>
-        /// <param name="e">args</param>
-        private void DemoButton_Click(object sender, EventArgs e)
-        {
-            this._spreadsheet.PerformDemo();
         }
     }
 }

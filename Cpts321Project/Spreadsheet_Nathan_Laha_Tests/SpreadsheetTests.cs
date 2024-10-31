@@ -37,14 +37,16 @@ namespace Spreadsheet_Nathan_Laha_Tests
         /// Edge case test for GetCell
         /// </summary>
         [Test]
-        public void Spreadsheet_ReturnsNullWhen_GetCell_OutOfRange()
+        public void Spreadsheet_ThrowsExceptionWhen_GetCell_OutOfRange()
         {
             // arrange
-            // act
-            var result = this._spreadsheet.GetCell(-1, 0);
+            Spreadsheet spreadsheet = new Spreadsheet(Constants.NUMCOLUMNS, Constants.NUMROWS);
 
-            // assert
-            Assert.That(result, Is.Null);
+            // act & assert
+            Assert.Throws<IndexOutOfRangeException>(() =>
+            {
+                spreadsheet.GetCell(-1, 0);
+            });
         }
 
         /// <summary>
@@ -71,16 +73,14 @@ namespace Spreadsheet_Nathan_Laha_Tests
         public void Spreadsheet_Evaluate_BasicReferenceFormula()
         {
             // arrange
-            MethodInfo methodInfo = this.GetMethod("EvaluateCellFormula");
-            TextCell textCell = new (0, 0);
-            textCell.Text = "=A1";
+            Spreadsheet spreadsheet = new Spreadsheet(Constants.NUMCOLUMNS, Constants.NUMROWS);
 
             // act
-            var isSuccess = methodInfo.Invoke(this._spreadsheet, new object[] { textCell });
+            spreadsheet.SetCellText(0, 0, "10");
+            spreadsheet.SetCellText(0, 1, "=A1");
 
             // assert
-            Assert.That(isSuccess, Is.True);
-            Assert.That(textCell.Value, Is.EqualTo(string.Empty));
+            Assert.That(spreadsheet.GetCell(0, 1).Value, Is.EqualTo("10"));
         }
 
         /// <summary>
@@ -90,29 +90,29 @@ namespace Spreadsheet_Nathan_Laha_Tests
         public void Spreadsheet_GetCellByName()
         {
             // arrange
-            MethodInfo methodInfo = this.GetMethod("GetCellByName");
+            Spreadsheet spreadsheet = new Spreadsheet(Constants.NUMCOLUMNS, Constants.NUMROWS);
+            spreadsheet.SetCellText(0, 0, "10");
+            var name = "A1";
 
             // act
-            Cell? cell = (Cell?)methodInfo.Invoke(this._spreadsheet, new object[] { "A0" });
+            Cell cell = spreadsheet.GetCellByName(name);
 
             // assert
-            Assert.That(cell, Is.EqualTo(this._spreadsheet.GetCell(0, 0)));
+            Assert.That(cell, Is.EqualTo(spreadsheet.GetCell(0, 0)));
         }
 
         /// <summary>
         /// Test getting an invalid cell name results in null
         /// </summary>
         [Test]
-        public void Spreadsheet_GetCellByName_ReturnsNull()
+        public void Spreadsheet_GetCellByName_ThrowsException()
         {
             // arrange
-            MethodInfo methodInfo = this.GetMethod("GetCellByName");
+            Spreadsheet spreadsheet = new Spreadsheet(Constants.NUMCOLUMNS, Constants.NUMROWS);
+            var name = "Bad Name";
 
-            // act
-            Cell? cell = (Cell?)methodInfo.Invoke(this._spreadsheet, new object[] { "Invalid Name" });
-
-            // assert
-            Assert.That(cell, Is.Null);
+            // act & assert
+            Assert.Throws<NullReferenceException>(() => spreadsheet.GetCellByName(name));
         }
 
         /// <summary>

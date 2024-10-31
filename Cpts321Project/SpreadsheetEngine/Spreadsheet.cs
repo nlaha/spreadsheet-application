@@ -6,6 +6,8 @@ namespace SpreadsheetEngine
 {
     using System.ComponentModel;
     using System.Text.RegularExpressions;
+    using SpreadsheetEngine.Exceptions;
+    using SpreadsheetEngine.ExpressionTree;
 
     /// <summary>
     /// Represents a container of cells and the cell factory
@@ -30,7 +32,7 @@ namespace SpreadsheetEngine
             {
                 for (int x = 0; x < numColumns; x++)
                 {
-                    this.cells[x, y] = new TextCell(x, y);
+                    this.cells[x, y] = new TextCell(x, y, string.Empty);
 
                     // subscribe to change events
                     this.cells[x, y].PropertyChanged += this.OnCellPropertyChanged;
@@ -54,32 +56,12 @@ namespace SpreadsheetEngine
         public int RowCount { get => this.cells.GetLength(1); }
 
         /// <summary>
-        /// Performs the demo for HW4
-        /// </summary>
-        public void PerformDemo()
-        {
-            var random = new Random();
-            for (int i = 0; i < 100; i++)
-            {
-                this.cells[
-                    random.Next(0, this.ColumnCount - 1),
-                    random.Next(0, this.RowCount - 1)].Text = "Hello World!";
-            }
-
-            for (int i = 0; i < this.RowCount; i++)
-            {
-                this.cells[1, i].Text = $"This is cell B{i}";
-                this.cells[0, i].Text = $"=B{i}";
-            }
-        }
-
-        /// <summary>
         /// Gets the cell at the specified location
         /// </summary>
         /// <param name="columnIndex">the column index of the cell</param>
         /// <param name="rowIndex">the row index of the cell</param>
         /// <returns>the cell</returns>
-        public Cell? GetCell(int columnIndex, int rowIndex)
+        public Cell GetCell(int columnIndex, int rowIndex)
         {
             // out of range check
             if (columnIndex > this.cells.GetLength(0) ||
@@ -87,10 +69,63 @@ namespace SpreadsheetEngine
                 columnIndex < 0 ||
                 rowIndex < 0)
             {
-                return null;
+                throw new IndexOutOfRangeException("Cell index out of range");
             }
 
             return this.cells[columnIndex, rowIndex];
+        }
+
+        /// <summary>
+        /// Sets the value of a cell
+        /// </summary>
+        /// <param name="columnIndex">the column index</param>
+        /// <param name="rowIndex">the row index</param>
+        /// <param name="value">the value to set</param>
+        public void SetCellValue(int columnIndex, int rowIndex, string value)
+        {
+            Cell? cell = this.GetCell(columnIndex, rowIndex);
+            if (cell != null)
+            {
+                cell.Text = value;
+            }
+        }
+
+        /// <summary>
+        /// Sets the text of a cell
+        /// </summary>
+        /// <param name="columnIndex">the column index</param>
+        /// <param name="rowIndex">the row index</param>
+        /// <param name="value">the value to set</param>
+        public void SetCellText(int columnIndex, int rowIndex, string value)
+        {
+            Cell? cell = this.GetCell(columnIndex, rowIndex);
+            if (cell != null)
+            {
+                cell.Text = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets a cell by it's name, i.e A1 or B23
+        /// </summary>
+        /// <param name="cellName">the cell's name string</param>
+        /// <returns>the cell</returns>
+        /// <exception cref="NullReferenceException">thrown when the cell name is invalid</exception>
+        public Cell GetCellByName(string cellName)
+        {
+            // skip the column
+            string? rowIdxString = cellName[1..];
+
+            // parse the row index
+            int rowIdx = 0;
+            bool rowParseSuccess = int.TryParse(rowIdxString, out rowIdx);
+            if (!rowParseSuccess)
+            {
+                throw new NullReferenceException($"Could not parse row index from {cellName}");
+            }
+
+            // get cell
+            return this.GetCell(this.ColumnToIndex(cellName[0]), rowIdx - 1);
         }
 
         /// <summary>
@@ -114,14 +149,25 @@ namespace SpreadsheetEngine
             Cell? cell = sender as Cell;
             if (cell != null)
             {
-                // cell doesn't have a formula
-                if (!cell.Text.StartsWith('='))
+                // check if cell has a formula
+                if (cell.Text.StartsWith('='))
                 {
-                    cell.Value = cell.Text;
+                    cell.PropertyChanged -= this.OnCellPropertyChanged;
+
+                    // if so we need to recreate it as an ExpressionCell
+                    cell = new ExpressionCell(cell.ColumnIndex, cell.RowIndex, cell.Text, this);
+                    cell.PropertyChanged += this.OnCellPropertyChanged;
+                    this.cells[cell.ColumnIndex, cell.RowIndex] = cell;
                 }
-                else
+                else if (cell is ExpressionCell)
                 {
-                    this.EvaluateCellFormula(cell);
+                    cell.PropertyChanged -= this.OnCellPropertyChanged;
+
+                    // otherwise, if it's an expression cell but doesn't start with a
+                    // '=' anymore, make it a text cell
+                    cell = new TextCell(cell.ColumnIndex, cell.RowIndex, cell.Text);
+                    cell.PropertyChanged += this.OnCellPropertyChanged;
+                    this.cells[cell.ColumnIndex, cell.RowIndex] = cell;
                 }
 
                 // invoke the property changed event
@@ -132,68 +178,6 @@ namespace SpreadsheetEngine
             {
                 throw new ArgumentNullException(nameof(cell));
             }
-        }
-
-        /// <summary>
-        /// Evaulates the formula in the specified cell and sets the cell's value
-        /// </summary>
-        /// <param name="cell">the cell</param>
-        /// <returns>False for errors, true if completed</returns>
-        private bool EvaluateCellFormula(Cell cell)
-        {
-            bool result = true;
-
-            // simple cell value fetch formula
-
-            // match on cell names
-            Regex regex = new Regex(@"[A-Z]\d*");
-            bool cellNameFound = regex.IsMatch(cell.Text);
-            if (!cellNameFound)
-            {
-                result = false;
-            }
-
-            // get cell from name found in formula
-            string cellName = regex.Match(cell.Text).Groups[0].Value;
-            Cell? refCell = this.GetCellByName(cellName);
-            if (refCell == null)
-            {
-                result = false;
-            }
-
-            if (result == false)
-            {
-                cell.Value = "ERR";
-            }
-            else
-            {
-                cell.Value = refCell!.Text;
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Gets a cell by it's name, i.e A1 or B23
-        /// </summary>
-        /// <param name="cellName">the cell's name string</param>
-        /// <returns>the cell, or null if not found</returns>
-        private Cell? GetCellByName(string cellName)
-        {
-            // skip the column
-            string? rowIdxString = cellName[1..];
-
-            // parse the row index
-            int rowIdx = 0;
-            bool rowParseSuccess = int.TryParse(rowIdxString, out rowIdx);
-            if (!rowParseSuccess)
-            {
-                return null;
-            }
-
-            // get cell
-            Cell? refCell = this.GetCell(this.ColumnToIndex(cellName[0]), rowIdx);
-            return refCell;
         }
     }
 }

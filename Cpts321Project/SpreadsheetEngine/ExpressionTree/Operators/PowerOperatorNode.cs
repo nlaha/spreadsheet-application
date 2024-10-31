@@ -1,21 +1,21 @@
-﻿// <copyright file="AdditionOperatorNode.cs" company="Nathan Laha">
+﻿// <copyright file="PowerOperatorNode.cs" company="Nathan Laha">
 // 11762135
 // </copyright>
 
 namespace SpreadsheetEngine.ExpressionTree.Operators
 {
     /// <summary>
-    /// Addition operator (+)
+    /// Subtraction Operator (^)
     /// </summary>
-    internal class AdditionOperatorNode : NodeBinaryOperator
+    internal class PowerOperatorNode : NodeBinaryOperator
     {
         /// <summary>
         /// Gets node regex
         /// </summary>
-        public static string NodeRegex => @"+";
+        public static string NodeRegex => @"^";
 
         /// <inheritdoc/>
-        public override EAssociativity Associativity => EAssociativity.Left;
+        public override EAssociativity Associativity => EAssociativity.Right;
 
         /// <inheritdoc/>
         public override int Precedence => 0;
@@ -28,7 +28,7 @@ namespace SpreadsheetEngine.ExpressionTree.Operators
                 throw new InvalidOperationException("Binary operator has one or more null operands");
             }
 
-            return this.Left.Evaluate() + this.Right.Evaluate();
+            return Math.Pow(this.Left.Evaluate(), this.Right.Evaluate());
         }
     }
 }

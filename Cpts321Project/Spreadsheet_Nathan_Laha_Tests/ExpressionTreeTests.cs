@@ -4,7 +4,9 @@
 
 namespace Spreadsheet_Nathan_Laha_Tests
 {
+    using System.Linq.Expressions;
     using System.Reflection;
+    using SpreadsheetEngine;
     using SpreadsheetEngine.Exceptions;
     using SpreadsheetEngine.ExpressionTree;
 
@@ -70,6 +72,9 @@ namespace Spreadsheet_Nathan_Laha_Tests
         [TestCase("2+3*3", 11)]
         [TestCase("12+12*(2+2)", 60)]
         [TestCase("12+12*2-2/2", 35)]
+        [TestCase("1+(1+(1+1))", 4)]
+        [TestCase("2^2+4", 8)]
+        [TestCase("(2+2)^2", 16)]
         public void ExpressionTree_EvaluatesExpressionCorrectly(string expression, double expectedValue)
         {
             // arrange
@@ -99,42 +104,6 @@ namespace Spreadsheet_Nathan_Laha_Tests
         }
 
         /// <summary>
-        /// Tests expression tree with variables
-        /// </summary>
-        [Test]
-        public void ExpressionTree_Variables()
-        {
-            // arrange
-            var tree = new ExpressionTree("B4+A2+24");
-            tree.SetVariable("B4", 2);
-            tree.SetVariable("A2", 3);
-
-            // act
-            var result = tree.Evaluate();
-
-            // assert
-            Assert.That(result, Is.EqualTo(29));
-        }
-
-        /// <summary>
-        /// Tests expression tree with variables on a complex expression
-        /// </summary>
-        [Test]
-        public void ExpressionTree_VariablesComplex()
-        {
-            // arrange
-            var tree = new ExpressionTree("(2+B4)*A2");
-            tree.SetVariable("B4", 2);
-            tree.SetVariable("A2", 3);
-
-            // act
-            var result = tree.Evaluate();
-
-            // assert
-            Assert.That(result, Is.EqualTo(12));
-        }
-
-        /// <summary>
         /// Tests the shunting yard algorithm
         /// </summary>
         [Test]
@@ -148,7 +117,65 @@ namespace Spreadsheet_Nathan_Laha_Tests
 
             // assert
             Assert.That(result, Is.Not.Null);
-            Assert.That(result as List<object>, Has.Count.EqualTo(10));
+            Assert.That(result as List<object>, Has.Count.EqualTo(9));
+        }
+
+        /// <summary>
+        /// Tests an expression with lots of parentheses
+        /// </summary>
+        [Test]
+        public void ExpressionTree_TestLotsOfParentheses()
+        {
+            // arrange
+            // act
+            var expression = new ExpressionTree("(((3+3)+(2+4)))");
+            var res = expression.Evaluate();
+
+            // assert
+            Assert.That(res, Is.EqualTo(12));
+        }
+
+        /// <summary>
+        /// Tests variable lookup from spreadsheet
+        /// </summary>
+        [Test]
+        public void ExpressionTree_TestVariableLookup()
+        {
+            // arrange
+            Spreadsheet spreadsheet = new Spreadsheet(50, 50);
+            TextCell cell = new TextCell(0, 0, "=A3+A2+2");
+
+            spreadsheet.SetCellValue(0, 2, "1");
+            spreadsheet.SetCellValue(0, 1, "1");
+
+            // act
+            var expression = new ExpressionTree(cell, spreadsheet);
+            var res = expression.Evaluate();
+
+            // assert
+            Assert.That(res, Is.EqualTo(4));
+        }
+
+        /// <summary>
+        /// Tests the expression tree with non-numeric variables
+        /// </summary>
+        [Test]
+        public void ExpressionTree_ThrowsNonNumericVariable()
+        {
+            // arrange
+            Spreadsheet spreadsheet = new Spreadsheet(50, 50);
+            TextCell cell = new TextCell(0, 0, "=A3+A2+2");
+
+            spreadsheet.SetCellValue(0, 2, "hello");
+            spreadsheet.SetCellValue(0, 1, "1");
+
+            var expression = new ExpressionTree(cell, spreadsheet);
+
+            // act & assert
+            Assert.Throws<InvalidExpressionTreeException>(() =>
+            {
+                expression.Evaluate();
+            });
         }
     }
 }

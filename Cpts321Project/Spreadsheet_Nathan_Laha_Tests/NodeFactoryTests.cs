@@ -26,12 +26,16 @@ namespace Spreadsheet_Nathan_Laha_Tests
         public void NodeFactory_CreateBinaryOperator(char op, Type expectedType)
         {
             // arrange
+            var opInstance = Activator.CreateInstance(expectedType);
+            
             // act
-            var node = NodeFactory.CreateBinaryOperator(op);
+            var nodeFactory = new NodeFactory();
+            var node = nodeFactory.CreateBinaryOperator(op);
 
             // assert
             Assert.That(node, Is.Not.Null);
             Assert.That(node.GetType(), Is.EqualTo(expectedType));
+            Assert.That(node.Precedence, Is.EqualTo(opInstance));
         }
 
         /// <summary>
@@ -44,6 +48,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
         [TestCase("-", typeof(SubtractionOperatorNode))]
         [TestCase("*", typeof(MultiplicationOperatorNode))]
         [TestCase("/", typeof(DivisionOperatorNode))]
+        [TestCase("^", typeof(PowerOperatorNode))]
         [TestCase("test", typeof(NodeVariable))]
         [TestCase("20", typeof(NodeNumericConstant))]
         [TestCase("20.0", typeof(NodeNumericConstant))]
@@ -52,7 +57,8 @@ namespace Spreadsheet_Nathan_Laha_Tests
             // arrange
             // act
             var node = null as Node;
-            var str = NodeFactory.CreateNode(new Dictionary<string, double> { }, expression, out node);
+            var nodeFactory = new NodeFactory();
+            var str = nodeFactory.CreateNode((name) => { return 0.0; }, expression, out node);
 
             // assert
             Assert.That(node, Is.Not.Null);
@@ -74,9 +80,10 @@ namespace Spreadsheet_Nathan_Laha_Tests
             // act
             // assert
             var node = null as Node;
+            var nodeFactory = new NodeFactory();
             Assert.Throws<InvalidExpressionTreeException>(() =>
             {
-                NodeFactory.CreateNode(new Dictionary<string, double> { }, expression, out node);
+                nodeFactory.CreateNode((name) => { return 0.0; }, expression, out node);
             });
         }
     }

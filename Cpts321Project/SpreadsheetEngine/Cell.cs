@@ -67,7 +67,7 @@ namespace SpreadsheetEngine
         /// <summary>
         /// Gets or sets the computed value of the cell
         /// </summary>
-        public string Value
+        public virtual string Value
         {
             get => this._value;
             protected internal set
@@ -80,7 +80,7 @@ namespace SpreadsheetEngine
         /// Helper function to invoke the property changed event
         /// </summary>
         /// <param name="propertyName">an optional property name</param>
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        public void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             if (this.PropertyChanged != null)
             {

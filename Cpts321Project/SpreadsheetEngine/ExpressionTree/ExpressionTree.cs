@@ -2,10 +2,11 @@
 // 11762135
 // </copyright>
 
-using System.Text.RegularExpressions;
-
 namespace SpreadsheetEngine.ExpressionTree
 {
+    using System;
+    using System.ComponentModel;
+    using System.Text.RegularExpressions;
     using SpreadsheetEngine.Exceptions;
     using SpreadsheetEngine.ExpressionTree.Interfaces;
 
@@ -13,25 +14,40 @@ namespace SpreadsheetEngine.ExpressionTree
     /// Represents an expression tree that will be evaluated to
     /// numeric values
     /// </summary>
-    public class ExpressionTree
+    internal class ExpressionTree
     {
         /// <summary>
-        /// Current expression string
+        /// The cell that this expression tree references, optional
         /// </summary>
-        private readonly string _expression;
+        private readonly Cell? _cell;
+
+        /// <summary>
+        /// Set of cells this expression references
+        /// </summary>
+        private readonly HashSet<Cell> _referencedCells;
+
+        /// <summary>
+        /// The node factory instance used to create nodes
+        /// </summary>
+        private readonly NodeFactory _nodeFactory;
 
         /// <summary>
         /// The root node of the expression tree
         /// </summary>
-        private readonly Node? _tree;
+        private Node? _tree;
+
+        /// <summary>
+        /// Optional spreadsheet used for lookup up variables
+        /// </summary>
+        private Spreadsheet? _spreadsheet;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExpressionTree"/> class.
         /// </summary>
         public ExpressionTree()
         {
-            this._expression = string.Empty;
-            this.Variables = new Dictionary<string, double>();
+            this._nodeFactory = new NodeFactory();
+            this._referencedCells = new HashSet<Cell>();
         }
 
         /// <summary>
@@ -40,9 +56,112 @@ namespace SpreadsheetEngine.ExpressionTree
         /// <param name="expression">the expression to generate the tree from</param>
         public ExpressionTree(string expression)
         {
-            this._expression = expression;
-            this.Variables = new Dictionary<string, double>();
+            this._nodeFactory = new NodeFactory();
+            this._referencedCells = new HashSet<Cell>();
+            this.ConstructTree(expression);
+        }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExpressionTree"/> class.
+        /// </summary>
+        /// <param name="cell">the cell containing the expression</param>
+        /// <param name="spreadsheet">spreadsheet used for looking up variable values</param>
+        public ExpressionTree(Cell cell, Spreadsheet spreadsheet)
+        {
+            // skipping the '=' character
+            this._cell = cell;
+            this._nodeFactory = new NodeFactory();
+            this._spreadsheet = spreadsheet;
+            this._referencedCells = new HashSet<Cell>();
+            this.ConstructTree(cell.Text[1..]);
+        }
+
+        /// <summary>
+        /// Finalizes an instance of the <see cref="ExpressionTree"/> class.
+        /// </summary>
+        ~ExpressionTree()
+        {
+            // unsubscribe from events
+            foreach (var cell in this._referencedCells)
+            {
+                cell.PropertyChanged -= this.OnReferencedCellPropertyChanged;
+            }
+        }
+
+        /// <summary>
+        /// Evaluate the expression tree value
+        /// </summary>
+        /// <returns>the evaluated value</returns>
+        public double Evaluate()
+        {
+            if (this._tree != null)
+            {
+                return this._tree.Evaluate();
+            }
+            else
+            {
+                throw new InvalidExpressionTreeException("Expression tree is empty");
+            }
+        }
+
+        /// <summary>
+        /// Gets the value of a variable from the spreadsheet if it exists
+        /// </summary>
+        /// <param name="variableName">the variable name, i.e. A2</param>
+        /// <returns>the value</returns>
+        /// <exception cref="InvalidExpressionTreeException">thrown when the varible could not be found or is invalid</exception>
+        public double GetVariableValue(string variableName)
+        {
+            if (this._spreadsheet != null)
+            {
+                var cell = this._spreadsheet.GetCellByName(variableName);
+                if (cell == null)
+                {
+                    throw new InvalidExpressionTreeException($"Referenced variable: \"{variableName}\" cannot be found!");
+                }
+
+                this._referencedCells.Add(cell);
+
+                // When any of the referenced cells change, we want to re-evaluate the expression
+                // when we set the evaluated value back to the cell, it will trigger the cell's property changed event
+                // and will update the UI
+                cell.PropertyChanged += this.OnReferencedCellPropertyChanged;
+
+                double value;
+                var success = double.TryParse(cell.Value, out value);
+                if (!success)
+                {
+                    throw new InvalidExpressionTreeException($"Referenced variable \"{variableName}\" is not numeric");
+                }
+
+                return value;
+            }
+            else
+            {
+                throw new InvalidExpressionTreeException("Spreadsheet is not set but variables were referenced");
+            }
+        }
+
+        /// <summary>
+        /// Called when any of the referenced cells change
+        /// </summary>
+        /// <param name="sender">the referenced cell that changed</param>
+        /// <param name="e">the event args</param>
+        private void OnReferencedCellPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (this._cell != null)
+            {
+                this._cell.NotifyPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Constructs the expression tree from the expression
+        /// </summary>
+        /// <param name="expression">expression</param>
+        /// <exception cref="InvalidExpressionTreeException">thrown when the expression is invalid</exception>
+        private void ConstructTree(string expression)
+        {
             // construct tree from postfix expression
             var stack = new Stack<Node>();
             foreach (object obj in this.PerformShuntingYardAlgorithm(expression))
@@ -76,37 +195,6 @@ namespace SpreadsheetEngine.ExpressionTree
         }
 
         /// <summary>
-        /// Gets dictionary of variables for this expression
-        /// </summary>
-        public Dictionary<string, double> Variables { get; }
-
-        /// <summary>
-        /// Sets the specified variable within the expression tree variables dictionary
-        /// </summary>
-        /// <param name="variableName">the name of the variable</param>
-        /// <param name="variableValue">the variable value</param>
-        public void SetVariable(string variableName, double variableValue)
-        {
-            this.Variables[variableName] = variableValue;
-        }
-
-        /// <summary>
-        /// Evaluate the expression tree value
-        /// </summary>
-        /// <returns>the evaluated value</returns>
-        public double Evaluate()
-        {
-            if (this._tree != null)
-            {
-                return this._tree.Evaluate();
-            }
-            else
-            {
-                throw new InvalidExpressionTreeException("Expression tree is empty");
-            }
-        }
-
-        /// <summary>
         /// Performs the shunting yard algorithm to convert the infix expression
         /// to a postfix expression
         /// </summary>
@@ -114,13 +202,6 @@ namespace SpreadsheetEngine.ExpressionTree
         /// <returns>the postfix expression</returns>
         private List<object> PerformShuntingYardAlgorithm(string infixExpression)
         {
-            // remove excess parentheses
-            // remove from beginning
-            infixExpression = Regex.Replace(infixExpression, "^[\\(\\)]+", string.Empty);
-
-            // remove from end
-            infixExpression = Regex.Replace(infixExpression, "[\\(\\)]+$", string.Empty);
-
             if (string.IsNullOrWhiteSpace(infixExpression))
             {
                 throw new InvalidExpressionTreeException("Expression cannot be empty");
@@ -133,22 +214,41 @@ namespace SpreadsheetEngine.ExpressionTree
 
             while (true)
             {
-                // process parentheses
                 char nextChar = nextExpression.FirstOrDefault();
-                if (nextChar == '(')
+
+                // skip spaces
+                if (nextChar == ' ')
+                {
+                    nextExpression = nextExpression[1..];
+                    continue;
+                }
+
+                // process open parentheses
+                while (nextChar == '(')
                 {
                     stack.Push(nextChar);
                     nextExpression = nextExpression[1..];
+                    nextChar = nextExpression.FirstOrDefault();
                 }
-                else if (nextChar == ')')
+
+                // process close parentheses
+                while (nextChar == ')')
                 {
+                    // Extra parentheses
+                    if (stack.Count == 0)
+                    {
+                        break;
+                    }
+
                     // pop until we see a left parenthesis
-                    while (stack.Count > 0 && !(stack.Peek() is char c && c == '('))
+                    while (stack.Count > 1 && !(stack.Peek() is char c && c == '('))
                     {
                         output.Add(stack.Pop());
                     }
 
+                    stack.Pop();
                     nextExpression = nextExpression[1..];
+                    nextChar = nextExpression.FirstOrDefault();
                 }
 
                 // break if we have no more expression
@@ -159,9 +259,9 @@ namespace SpreadsheetEngine.ExpressionTree
 
                 // process and create nodes
                 Node node;
-                nextExpression = NodeFactory.CreateNode(this.Variables, nextExpression, out node);
+                nextExpression = this._nodeFactory.CreateNode(this.GetVariableValue, nextExpression, out node);
 
-                // process operators by precedence
+                // process operators by precedence and associativity
                 if (node is NodeBinaryOperator op)
                 {
                     var opPrevious = stack.Count > 0 ? stack.Peek() as NodeBinaryOperator : null;
@@ -188,9 +288,10 @@ namespace SpreadsheetEngine.ExpressionTree
             // pop remaining operators
             while (stack.Count > 0)
             {
-                if ((stack.Peek() as string) == "(")
+                // pop any left-hand parentheses that are left over
+                if (stack.Peek() as char? == '(')
                 {
-                    throw new InvalidExpressionTreeException("Mismatched parentheses");
+                    throw new InvalidExpressionTreeException("Mismatched Parentheses");
                 }
 
                 output.Add(stack.Pop());

@@ -9,6 +9,11 @@ namespace SpreadsheetEngine.ExpressionTree.Operators
     /// </summary>
     internal class SubtractionOperatorNode : NodeBinaryOperator
     {
+        /// <summary>
+        /// Gets node regex
+        /// </summary>
+        public static string NodeRegex => @"-";
+
         /// <inheritdoc/>
         public override EAssociativity Associativity => EAssociativity.Left;
 
