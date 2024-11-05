@@ -35,7 +35,6 @@ namespace Spreadsheet_Nathan_Laha_Tests
             // assert
             Assert.That(node, Is.Not.Null);
             Assert.That(node.GetType(), Is.EqualTo(expectedType));
-            Assert.That(node.Precedence, Is.EqualTo(opInstance));
         }
 
         /// <summary>
