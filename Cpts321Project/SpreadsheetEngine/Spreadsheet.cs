@@ -152,20 +152,20 @@ namespace SpreadsheetEngine
                 // check if cell has a formula
                 if (cell.Text.StartsWith('='))
                 {
-                    cell.PropertyChanged -= this.OnCellPropertyChanged;
-
                     // if so we need to recreate it as an ExpressionCell
-                    cell = new ExpressionCell(cell.ColumnIndex, cell.RowIndex, cell.Text, this);
+                    var newCell = new ExpressionCell(cell.ColumnIndex, cell.RowIndex, cell.Text, this);
+                    cell.PropertyChanged -= this.OnCellPropertyChanged;
+                    cell = newCell;
                     cell.PropertyChanged += this.OnCellPropertyChanged;
                     this.cells[cell.ColumnIndex, cell.RowIndex] = cell;
                 }
                 else if (cell is ExpressionCell)
                 {
-                    cell.PropertyChanged -= this.OnCellPropertyChanged;
-
                     // otherwise, if it's an expression cell but doesn't start with a
                     // '=' anymore, make it a text cell
-                    cell = new TextCell(cell.ColumnIndex, cell.RowIndex, cell.Text);
+                    var newCell = new TextCell(cell.ColumnIndex, cell.RowIndex, cell.Text);
+                    cell.PropertyChanged -= this.OnCellPropertyChanged;
+                    cell = newCell;
                     cell.PropertyChanged += this.OnCellPropertyChanged;
                     this.cells[cell.ColumnIndex, cell.RowIndex] = cell;
                 }

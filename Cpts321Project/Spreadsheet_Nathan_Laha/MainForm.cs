@@ -105,7 +105,7 @@ namespace Spreadsheet_Nathan_Laha
             var dataGridCell = this.GetDataGridCell(e.ColumnIndex, e.RowIndex);
 
             // set display to text view mode
-            dataGridCell.Value = cell.Text;
+            dataGridCell.Value = cell?.Text ?? string.Empty;
         }
 
         /// <summary>
@@ -121,16 +121,17 @@ namespace Spreadsheet_Nathan_Laha
             // update cell text
             try
             {
-                cell.Text = dataGridCell.Value?.ToString() ?? string.Empty;
+                cell!.Text = dataGridCell.Value?.ToString() ?? string.Empty;
+                dataGridCell.ErrorText = string.Empty;
+
+                // force a property change event, this way if we don't change the text at all
+                // we still get back into value display mode
+                cell!.NotifyPropertyChanged();
             }
             catch (InvalidExpressionTreeException exception)
             {
                 dataGridCell.ErrorText = exception.Message;
             }
-
-            // force a property change event, this way if we don't change the text at all
-            // we still get back into value display mode
-            cell.NotifyPropertyChanged();
         }
 
         /// <summary>
