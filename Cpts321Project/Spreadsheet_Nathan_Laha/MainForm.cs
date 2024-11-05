@@ -83,14 +83,24 @@ namespace Spreadsheet_Nathan_Laha
             }
 
             var dataGridCell = this.GetDataGridCell(cell.ColumnIndex, cell.RowIndex);
-            try
+
+            if (e.PropertyName == "BGColor")
             {
-                dataGridCell.Value = cell.Value;
-                dataGridCell.ErrorText = string.Empty;
+                // update cell background color when it changes
+                dataGridCell.Style.BackColor = System.Drawing.Color.FromArgb((int)cell.BGColor);
             }
-            catch (InvalidExpressionTreeException exception)
+            else
             {
-                dataGridCell.ErrorText = exception.Message;
+                // we're not changing the background color so update the value
+                try
+                {
+                    dataGridCell.Value = cell.Value;
+                    dataGridCell.ErrorText = string.Empty;
+                }
+                catch (InvalidExpressionTreeException exception)
+                {
+                    dataGridCell.ErrorText = exception.Message;
+                }
             }
         }
 
@@ -163,6 +173,26 @@ namespace Spreadsheet_Nathan_Laha
 
             // make sure numbers are all visible
             dataGrid.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
+        }
+
+        /// <summary>
+        /// Callback for the cell background color button
+        /// </summary>
+        /// <param name="sender">the sender</param>
+        /// <param name="e">the event args</param>
+        private void BackgroundColorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var result = this.colorDialog.ShowDialog();
+
+            if (result == DialogResult.OK)
+            {
+                foreach (DataGridViewCell dataGridCell in this.dataGrid.SelectedCells)
+                {
+                    Cell cell = this._spreadsheet.GetCell(dataGridCell.ColumnIndex, dataGridCell.RowIndex);
+
+                    cell.BGColor = (uint)this.colorDialog.Color.ToArgb();
+                }
+            }
         }
     }
 }

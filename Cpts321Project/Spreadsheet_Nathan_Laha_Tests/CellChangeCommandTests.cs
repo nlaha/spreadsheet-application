@@ -35,9 +35,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
             var cell = new TextCell(0, 0, string.Empty);
             var command = new CellChangeCommand(cell, "Text", 123);
 
-            command.Execute();
-
-            Assert.That(cell.Text, Is.EqualTo("123"));
+            Assert.Throws<System.ArgumentException>(() => command.Execute());
         }
     }
 }

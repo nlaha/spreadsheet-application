@@ -31,8 +31,8 @@ namespace Spreadsheet_Nathan_Laha_Tests
             this._collection.Undo();
 
             // assert
-            Stack<ICommand>? undoStack = (Stack<ICommand>?)TestHelpers.GetProperty(this._collection, "undoStack");
-            Stack<ICommand>? redoStack = (Stack<ICommand>?)TestHelpers.GetProperty(this._collection, "redoStack");
+            Stack<ICommand>? undoStack = (Stack<ICommand>?)TestHelpers.GetField(this._collection, "_undoStack");
+            Stack<ICommand>? redoStack = (Stack<ICommand>?)TestHelpers.GetField(this._collection, "_redoStack");
 
             Assert.That(undoStack, Is.Not.Null);
             Assert.That(redoStack, Is.Not.Null);
@@ -55,8 +55,8 @@ namespace Spreadsheet_Nathan_Laha_Tests
             this._collection.Redo();
 
             // assert
-            Stack<ICommand>? undoStack = (Stack<ICommand>?)TestHelpers.GetProperty(this._collection, "undoStack");
-            Stack<ICommand>? redoStack = (Stack<ICommand>?)TestHelpers.GetProperty(this._collection, "redoStack");
+            Stack<ICommand>? undoStack = (Stack<ICommand>?)TestHelpers.GetField(this._collection, "_undoStack");
+            Stack<ICommand>? redoStack = (Stack<ICommand>?)TestHelpers.GetField(this._collection, "_redoStack");
 
             Assert.That(undoStack, Is.Not.Null);
             Assert.That(redoStack, Is.Not.Null);
@@ -77,8 +77,8 @@ namespace Spreadsheet_Nathan_Laha_Tests
             this._collection.Undo();
 
             // assert
-            Stack<ICommand>? undoStack = (Stack<ICommand>?)TestHelpers.GetProperty(this._collection, "undoStack");
-            Stack<ICommand>? redoStack = (Stack<ICommand>?)TestHelpers.GetProperty(this._collection, "redoStack");
+            Stack<ICommand>? undoStack = (Stack<ICommand>?)TestHelpers.GetField(this._collection, "_undoStack");
+            Stack<ICommand>? redoStack = (Stack<ICommand>?)TestHelpers.GetField(this._collection, "_redoStack");
 
             Assert.That(undoStack, Is.Not.Null);
             Assert.That(redoStack, Is.Not.Null);
