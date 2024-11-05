@@ -32,6 +32,9 @@ namespace Spreadsheet_Nathan_Laha
             this._spreadsheet = new Spreadsheet(Constants.NUMCOLUMNS, Constants.NUMROWS);
 
             this._spreadsheet.CellPropertyChanged += this.OnCellPropertyChanged;
+
+            this._spreadsheet.UndoRedoCollection.CurrentUndoRedoNamesChanged += this.UpdateUndoRedoNames;
+            this.UpdateUndoRedoNames(null, null);
         }
 
         /// <summary>
@@ -133,7 +136,7 @@ namespace Spreadsheet_Nathan_Laha
             try
             {
                 var command = new CellChangeCommand(cell!, "Text", dataGridCell.Value?.ToString() ?? string.Empty);
-                this.OnCommand(command);
+                this.ExecuteCommand(command);
 
                 dataGridCell.ErrorText = string.Empty;
 
@@ -193,9 +196,24 @@ namespace Spreadsheet_Nathan_Laha
                 {
                     Cell cell = this._spreadsheet.GetCell(dataGridCell.ColumnIndex, dataGridCell.RowIndex);
 
-                    cell.BGColor = (uint)this.colorDialog.Color.ToArgb();
+                    var command = new CellChangeCommand(cell, "BGColor", (uint)this.colorDialog.Color.ToArgb());
+                    this.ExecuteCommand(command);
                 }
             }
+        }
+
+        /// <summary>
+        /// Updates the text of the undo/redo buttons
+        /// </summary>
+        /// <param name="undoName">what will be undone</param>
+        /// <param name="redoName">what will be re-done</param>
+        private void UpdateUndoRedoNames(string? undoName, string? redoName)
+        {
+            this.undoToolStripMenuItem.Text = $"Undo {undoName ?? string.Empty}";
+            this.redoToolStripMenuItem.Text = $"Redo {redoName ?? string.Empty}";
+
+            this.undoToolStripMenuItem.Enabled = undoName != null;
+            this.redoToolStripMenuItem.Enabled = redoName != null;
         }
 
         /// <summary>
@@ -203,7 +221,7 @@ namespace Spreadsheet_Nathan_Laha
         /// and executes it
         /// </summary>
         /// <param name="command">the command</param>
-        private void OnCommand(ICommand command)
+        private void ExecuteCommand(ICommand command)
         {
             command.Execute();
             this._spreadsheet.UndoRedoCollection.AddCommand(command);
