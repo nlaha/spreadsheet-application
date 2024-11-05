@@ -9,7 +9,7 @@ namespace SpreadsheetEngine
     /// <summary>
     /// Holds the undo and redo history for the spreadsheet
     /// </summary>
-    internal class UndoRedoCollection
+    public class UndoRedoCollection
     {
         /// <summary>
         /// Undo command stack

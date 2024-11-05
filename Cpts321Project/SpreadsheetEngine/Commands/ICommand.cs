@@ -7,8 +7,14 @@ namespace SpreadsheetEngine.Commands
     /// <summary>
     /// Interface for commands send from the UI
     /// </summary>
-    internal interface ICommand
+    public interface ICommand
     {
+        /// <summary>
+        /// Gets a friendly name for the command
+        /// </summary>
+        /// <returns>the command name</returns>
+        string GetName();
+
         /// <summary>
         /// Execute the command
         /// </summary>

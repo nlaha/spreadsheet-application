@@ -1,62 +1,80 @@
-﻿// <copyright file="RedoCommand.cs" company="Nathan Laha">
+﻿// <copyright file="CellChangeCommand.cs" company="Nathan Laha">
 // 11762135
 // </copyright>
 
 namespace SpreadsheetEngine.Commands
 {
+    using System.Reflection;
+
     /// <summary>
     /// Command for when we want to change the properties of a cell
     /// </summary>
-    internal class CellChangeCommand : ICommand
+    public class CellChangeCommand : ICommand
     {
         /// <summary>
-        /// The cell instance to change
+        /// The target cell to modify
         /// </summary>
-        private Cell _cell;
+        private readonly Cell _target;
 
         /// <summary>
-        /// The property name to change
+        /// The name of the property to change
         /// </summary>
-        private string _propertyName;
+        private readonly string _propertyName;
 
         /// <summary>
-        /// The value to set the property to
+        /// The new value of the property
         /// </summary>
-        private object? _propertyValue;
+        private readonly object? _newValue;
 
         /// <summary>
-        /// The previous value of the property (for undoing)
+        /// The old value of the property
         /// </summary>
         private object? _oldValue;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CellChangeCommand"/> class.
         /// </summary>
-        /// <param name="cell">the cell to change</param>
+        /// <param name="target">the cell to register the command on</param>
         /// <param name="propertyName">the property to change</param>
-        /// <param name="propertyValue">the property value</param>
-        public CellChangeCommand(Cell cell, string propertyName, object? propertyValue)
+        /// <param name="newValue">the new property value</param>
+        public CellChangeCommand(Cell target, string propertyName, object newValue)
         {
-            this._cell = cell;
+            this._target = target;
             this._propertyName = propertyName;
-            this._propertyValue = propertyValue;
+            this._newValue = newValue;
         }
 
         /// <inheritdoc/>
         public void Execute()
         {
-            // use reflection to change the property
-            var property = this._cell.GetType().GetProperty(this._propertyName);
-            this._oldValue = property?.GetValue(this._cell);
-            property?.SetValue(this._cell, this._propertyValue);
+            // use reflection to modify the property on the cell
+            PropertyInfo? property = this._target.GetType()?.GetProperty(this._propertyName);
+            if (property == null)
+            {
+                throw new ArgumentNullException(nameof(this._propertyName), "Property does not exist on the target object.");
+            }
+
+            this._oldValue = property.GetValue(this._target);
+            property.SetValue(this._target, this._newValue);
+        }
+
+        /// <inheritdoc/>
+        public string GetName()
+        {
+            return $"changing {this._propertyName} on cell";
         }
 
         /// <inheritdoc/>
         public void Undo()
         {
-            // use reflection to change the property to the old value
-            var property = this._cell.GetType().GetProperty(this._propertyName);
-            property?.SetValue(this._cell, this._oldValue);
+            // use reflection to revert the property value back to the old value
+            PropertyInfo? property = this._target.GetType()?.GetProperty(this._propertyName);
+            if (property == null)
+            {
+                throw new ArgumentNullException(nameof(this._propertyName), "Property does not exist on the target object.");
+            }
+
+            property.SetValue(this._target, this._oldValue);
         }
     }
 }

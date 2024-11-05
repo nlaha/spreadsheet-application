@@ -9,6 +9,7 @@ namespace Spreadsheet_Nathan_Laha
     using System.Reflection;
     using System.Windows.Forms;
     using SpreadsheetEngine;
+    using SpreadsheetEngine.Commands;
     using SpreadsheetEngine.Exceptions;
 
     /// <summary>
@@ -131,7 +132,9 @@ namespace Spreadsheet_Nathan_Laha
             // update cell text
             try
             {
-                cell!.Text = dataGridCell.Value?.ToString() ?? string.Empty;
+                var command = new CellChangeCommand(cell!, "Text", dataGridCell.Value?.ToString() ?? string.Empty);
+                this.OnCommand(command);
+
                 dataGridCell.ErrorText = string.Empty;
 
                 // force a property change event, this way if we don't change the text at all
@@ -193,6 +196,37 @@ namespace Spreadsheet_Nathan_Laha
                     cell.BGColor = (uint)this.colorDialog.Color.ToArgb();
                 }
             }
+        }
+
+        /// <summary>
+        /// Adds a command to the spreadsheet's undo history
+        /// and executes it
+        /// </summary>
+        /// <param name="command">the command</param>
+        private void OnCommand(ICommand command)
+        {
+            command.Execute();
+            this._spreadsheet.UndoRedoCollection.AddCommand(command);
+        }
+
+        /// <summary>
+        /// Called when the undo button is clicked
+        /// </summary>
+        /// <param name="sender">the sender</param>
+        /// <param name="e">the event args</param>
+        private void UndoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this._spreadsheet.UndoRedoCollection.Undo();
+        }
+
+        /// <summary>
+        /// Called when the redo button is clicked
+        /// </summary>
+        /// <param name="sender">the sender</param>
+        /// <param name="e">the event args</param>
+        private void RedoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this._spreadsheet.UndoRedoCollection.Redo();
         }
     }
 }

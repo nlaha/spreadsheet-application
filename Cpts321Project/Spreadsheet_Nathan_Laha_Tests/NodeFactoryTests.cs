@@ -27,7 +27,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
         {
             // arrange
             var opInstance = Activator.CreateInstance(expectedType);
-            
+
             // act
             var nodeFactory = new NodeFactory();
             var node = nodeFactory.CreateBinaryOperator(op);
