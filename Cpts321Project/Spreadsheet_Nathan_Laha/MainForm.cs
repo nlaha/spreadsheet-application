@@ -9,6 +9,7 @@ namespace Spreadsheet_Nathan_Laha
     using System.Reflection;
     using System.Windows.Forms;
     using SpreadsheetEngine;
+    using SpreadsheetEngine.Commands;
     using SpreadsheetEngine.Exceptions;
 
     /// <summary>
@@ -31,6 +32,9 @@ namespace Spreadsheet_Nathan_Laha
             this._spreadsheet = new Spreadsheet(Constants.NUMCOLUMNS, Constants.NUMROWS);
 
             this._spreadsheet.CellPropertyChanged += this.OnCellPropertyChanged;
+
+            this._spreadsheet.UndoRedoCollection.CurrentUndoRedoNamesChanged += this.UpdateUndoRedoNames;
+            this.UpdateUndoRedoNames(null, null);
         }
 
         /// <summary>
@@ -83,14 +87,24 @@ namespace Spreadsheet_Nathan_Laha
             }
 
             var dataGridCell = this.GetDataGridCell(cell.ColumnIndex, cell.RowIndex);
-            try
+
+            if (e.PropertyName == "BGColor")
             {
-                dataGridCell.Value = cell.Value;
-                dataGridCell.ErrorText = string.Empty;
+                // update cell background color when it changes
+                dataGridCell.Style.BackColor = System.Drawing.Color.FromArgb((int)cell.BGColor);
             }
-            catch (InvalidExpressionTreeException exception)
+            else
             {
-                dataGridCell.ErrorText = exception.Message;
+                // we're not changing the background color so update the value
+                try
+                {
+                    dataGridCell.Value = cell.Value;
+                    dataGridCell.ErrorText = string.Empty;
+                }
+                catch (InvalidExpressionTreeException exception)
+                {
+                    dataGridCell.ErrorText = exception.Message;
+                }
             }
         }
 
@@ -105,7 +119,7 @@ namespace Spreadsheet_Nathan_Laha
             var dataGridCell = this.GetDataGridCell(e.ColumnIndex, e.RowIndex);
 
             // set display to text view mode
-            dataGridCell.Value = cell.Text;
+            dataGridCell.Value = cell?.Text ?? string.Empty;
         }
 
         /// <summary>
@@ -121,16 +135,19 @@ namespace Spreadsheet_Nathan_Laha
             // update cell text
             try
             {
-                cell.Text = dataGridCell.Value?.ToString() ?? string.Empty;
+                var command = new CellChangeCommand(cell!, "Text", dataGridCell.Value?.ToString() ?? string.Empty);
+                this.ExecuteCommand(command);
+
+                dataGridCell.ErrorText = string.Empty;
+
+                // force a property change event, this way if we don't change the text at all
+                // we still get back into value display mode
+                cell!.NotifyPropertyChanged();
             }
             catch (InvalidExpressionTreeException exception)
             {
                 dataGridCell.ErrorText = exception.Message;
             }
-
-            // force a property change event, this way if we don't change the text at all
-            // we still get back into value display mode
-            cell.NotifyPropertyChanged();
         }
 
         /// <summary>
@@ -162,6 +179,72 @@ namespace Spreadsheet_Nathan_Laha
 
             // make sure numbers are all visible
             dataGrid.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
+        }
+
+        /// <summary>
+        /// Callback for the cell background color button
+        /// </summary>
+        /// <param name="sender">the sender</param>
+        /// <param name="e">the event args</param>
+        private void BackgroundColorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var result = this.colorDialog.ShowDialog();
+
+            if (result == DialogResult.OK)
+            {
+                foreach (DataGridViewCell dataGridCell in this.dataGrid.SelectedCells)
+                {
+                    Cell cell = this._spreadsheet.GetCell(dataGridCell.ColumnIndex, dataGridCell.RowIndex);
+
+                    var command = new CellChangeCommand(cell, "BGColor", (uint)this.colorDialog.Color.ToArgb());
+                    this.ExecuteCommand(command);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Updates the text of the undo/redo buttons
+        /// </summary>
+        /// <param name="undoName">what will be undone</param>
+        /// <param name="redoName">what will be re-done</param>
+        private void UpdateUndoRedoNames(string? undoName, string? redoName)
+        {
+            this.undoToolStripMenuItem.Text = $"Undo {undoName ?? string.Empty}";
+            this.redoToolStripMenuItem.Text = $"Redo {redoName ?? string.Empty}";
+
+            this.undoToolStripMenuItem.Enabled = undoName != null;
+            this.redoToolStripMenuItem.Enabled = redoName != null;
+        }
+
+        /// <summary>
+        /// Adds a command to the spreadsheet's undo history
+        /// and executes it
+        /// </summary>
+        /// <param name="command">the command</param>
+        private void ExecuteCommand(ICommand command)
+        {
+            command.Execute();
+            this._spreadsheet.UndoRedoCollection.AddCommand(command);
+        }
+
+        /// <summary>
+        /// Called when the undo button is clicked
+        /// </summary>
+        /// <param name="sender">the sender</param>
+        /// <param name="e">the event args</param>
+        private void UndoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this._spreadsheet.UndoRedoCollection.Undo();
+        }
+
+        /// <summary>
+        /// Called when the redo button is clicked
+        /// </summary>
+        /// <param name="sender">the sender</param>
+        /// <param name="e">the event args</param>
+        private void RedoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this._spreadsheet.UndoRedoCollection.Redo();
         }
     }
 }

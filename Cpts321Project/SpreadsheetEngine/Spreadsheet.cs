@@ -6,6 +6,7 @@ namespace SpreadsheetEngine
 {
     using System.ComponentModel;
     using System.Text.RegularExpressions;
+    using SpreadsheetEngine.Commands;
     using SpreadsheetEngine.Exceptions;
     using SpreadsheetEngine.ExpressionTree;
 
@@ -17,7 +18,7 @@ namespace SpreadsheetEngine
         /// <summary>
         /// 2D array of cells in the spreadsheet
         /// </summary>
-        private readonly Cell[,] cells;
+        private readonly Cell[,] _cells;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Spreadsheet"/> class.
@@ -26,16 +27,17 @@ namespace SpreadsheetEngine
         /// <param name="numRows">the number of rows</param>
         public Spreadsheet(int numColumns, int numRows)
         {
-            this.cells = new Cell[numColumns, numRows];
+            this._cells = new Cell[numColumns, numRows];
+            this.UndoRedoCollection = new UndoRedoCollection();
 
             for (int y = 0; y < numRows; y++)
             {
                 for (int x = 0; x < numColumns; x++)
                 {
-                    this.cells[x, y] = new TextCell(x, y, string.Empty);
+                    this._cells[x, y] = new TextCell(x, y, string.Empty);
 
                     // subscribe to change events
-                    this.cells[x, y].PropertyChanged += this.OnCellPropertyChanged;
+                    this._cells[x, y].PropertyChanged += this.OnCellPropertyChanged;
                 }
             }
         }
@@ -46,14 +48,19 @@ namespace SpreadsheetEngine
         public event PropertyChangedEventHandler? CellPropertyChanged;
 
         /// <summary>
+        /// Gets the collection of undo/redo commands
+        /// </summary>
+        public UndoRedoCollection UndoRedoCollection { get; }
+
+        /// <summary>
         /// Gets the number of columns
         /// </summary>
-        public int ColumnCount { get => this.cells.GetLength(0); }
+        public int ColumnCount { get => this._cells.GetLength(0); }
 
         /// <summary>
         /// Gets the number of rows
         /// </summary>
-        public int RowCount { get => this.cells.GetLength(1); }
+        public int RowCount { get => this._cells.GetLength(1); }
 
         /// <summary>
         /// Gets the cell at the specified location
@@ -64,15 +71,15 @@ namespace SpreadsheetEngine
         public Cell GetCell(int columnIndex, int rowIndex)
         {
             // out of range check
-            if (columnIndex > this.cells.GetLength(0) ||
-                rowIndex > this.cells.GetLength(1) ||
+            if (columnIndex > this._cells.GetLength(0) ||
+                rowIndex > this._cells.GetLength(1) ||
                 columnIndex < 0 ||
                 rowIndex < 0)
             {
                 throw new IndexOutOfRangeException("Cell index out of range");
             }
 
-            return this.cells[columnIndex, rowIndex];
+            return this._cells[columnIndex, rowIndex];
         }
 
         /// <summary>
@@ -152,23 +159,23 @@ namespace SpreadsheetEngine
                 // check if cell has a formula
                 if (cell.Text.StartsWith('='))
                 {
-                    cell.PropertyChanged -= this.OnCellPropertyChanged;
-
                     // if so we need to recreate it as an ExpressionCell
-                    cell = new ExpressionCell(cell.ColumnIndex, cell.RowIndex, cell.Text, this);
+                    var newCell = new ExpressionCell(cell.ColumnIndex, cell.RowIndex, cell.Text, this);
+                    cell.PropertyChanged -= this.OnCellPropertyChanged;
+                    cell = newCell;
                     cell.PropertyChanged += this.OnCellPropertyChanged;
-                    this.cells[cell.ColumnIndex, cell.RowIndex] = cell;
                 }
                 else if (cell is ExpressionCell)
                 {
-                    cell.PropertyChanged -= this.OnCellPropertyChanged;
-
                     // otherwise, if it's an expression cell but doesn't start with a
                     // '=' anymore, make it a text cell
-                    cell = new TextCell(cell.ColumnIndex, cell.RowIndex, cell.Text);
+                    var newCell = new TextCell(cell.ColumnIndex, cell.RowIndex, cell.Text);
+                    cell.PropertyChanged -= this.OnCellPropertyChanged;
+                    cell = newCell;
                     cell.PropertyChanged += this.OnCellPropertyChanged;
-                    this.cells[cell.ColumnIndex, cell.RowIndex] = cell;
                 }
+
+                this._cells[cell.ColumnIndex, cell.RowIndex] = cell;
 
                 // invoke the property changed event
                 // this should trigger an update in the UI

@@ -41,5 +41,37 @@ namespace Spreadsheet_Nathan_Laha_Tests
 
             return method!;
         }
+
+        /// <summary>
+        /// Gets a field on an object instance using reflection
+        /// </summary>
+        /// <typeparam name="T">the type of the object</typeparam>
+        /// <param name="instance">the instance of the object</param>
+        /// <param name="fieldName">the name of the field</param>
+        /// <returns>the field value</returns>
+        internal static object? GetField<T>(T instance, string fieldName)
+        {
+            if (string.IsNullOrWhiteSpace(fieldName))
+            {
+                Assert.Fail("propertyName cannot be null or whitespace");
+            }
+
+            if (instance == null)
+            {
+                Assert.Fail("instance cannot be null");
+            }
+
+            var field = instance!.GetType()
+                .GetField(
+                    fieldName,
+                    BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+
+            if (field == null)
+            {
+                Assert.Fail(string.Format("{0} property not found", fieldName));
+            }
+
+            return field!.GetValue(instance);
+        }
     }
 }

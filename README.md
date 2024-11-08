@@ -20,3 +20,6 @@ Disabled "Opening square brackets should be spaced correctly"
 
 Disabled "Closing parenthesis should be spaced correctly"
 - This causes problems with the `!` operator when using it after parentheses, it forces an extra space which looks bad
+
+**Note:**
+GitHub Copilot has been used to autocomplete some comments/documentation.

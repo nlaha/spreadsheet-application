@@ -23,6 +23,12 @@ namespace SpreadsheetEngine
         protected string _value;
 
         /// <summary>
+        /// Protected field for the background color of the cell
+        /// in RGBA notation
+        /// </summary>
+        protected uint _bgColor;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Cell"/> class.
         /// </summary>
         /// <param name="rowIndex">the row index of the cell</param>
@@ -33,10 +39,27 @@ namespace SpreadsheetEngine
             this.ColumnIndex = columnIndex;
             this._text = string.Empty;
             this._value = string.Empty;
+            this._bgColor = 0xFFFFFFFF;
         }
 
         /// <inheritdoc/>
         public event PropertyChangedEventHandler? PropertyChanged;
+
+        /// <summary>
+        /// Gets or sets the background color of the cell in RGBA notation
+        /// </summary>
+        public uint BGColor
+        {
+            get => this._bgColor;
+            set
+            {
+                if (this._bgColor != value)
+                {
+                    this._bgColor = value;
+                    this.NotifyPropertyChanged();
+                }
+            }
+        }
 
         /// <summary>
         /// Gets the row index of the cell in the spreadsheet
