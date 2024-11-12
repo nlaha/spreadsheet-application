@@ -116,44 +116,6 @@ namespace Spreadsheet_Nathan_Laha_Tests
         }
 
         /// <summary>
-        /// Test spreadsheet loading
-        /// </summary>
-        [Test]
-        public void Spreadsheet_LoadEmpty_ClearsCells()
-        {
-            // arrange
-            Spreadsheet spreadsheet = new (Constants.NUMCOLUMNS, Constants.NUMROWS);
-            spreadsheet.SetCellText(0, 0, "Hello World");
-
-            Stream stream = new MemoryStream();
-
-            // act
-            spreadsheet.Load(stream);
-
-            // assert
-            Assert.That(spreadsheet.GetCell(0, 0).Text, Is.EqualTo(string.Empty));
-        }
-
-        /// <summary>
-        /// Tests saving a spreadsheet
-        /// </summary>
-        [Test]
-        public void Spreadsheet_Save()
-        {
-            // arrange
-            Spreadsheet spreadsheet = new(Constants.NUMCOLUMNS, Constants.NUMROWS);
-            spreadsheet.SetCellText(0, 0, "Hello World");
-
-            Stream stream = new MemoryStream();
-
-            // act
-            spreadsheet.Save(stream);
-
-            // assert
-            Assert.That(stream.Length, Is.GreaterThan(0));
-        }
-
-        /// <summary>
         /// Gets a method on the main form object using reflection
         /// </summary>
         /// <param name="methodName">the name of the method</param>

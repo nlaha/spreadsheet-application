@@ -6,6 +6,7 @@ namespace SpreadsheetEngine
 {
     using System.ComponentModel;
     using System.Text.RegularExpressions;
+    using System.Xml.Serialization;
     using SpreadsheetEngine.Commands;
     using SpreadsheetEngine.Exceptions;
     using SpreadsheetEngine.ExpressionTree;
@@ -13,11 +14,13 @@ namespace SpreadsheetEngine
     /// <summary>
     /// Represents a container of cells and the cell factory
     /// </summary>
+    [XmlRoot("Spreadsheet", Namespace = "https://nlaha.com", IsNullable = false)]
     public class Spreadsheet
     {
         /// <summary>
         /// 2D array of cells in the spreadsheet
         /// </summary>
+        [XmlArray("Cells")]
         private readonly Cell[,] _cells;
 
         /// <summary>
@@ -55,11 +58,13 @@ namespace SpreadsheetEngine
         /// <summary>
         /// Gets the number of columns
         /// </summary>
+        [XmlAttribute("ColumnCount")]
         public int ColumnCount { get => this._cells.GetLength(0); }
 
         /// <summary>
         /// Gets the number of rows
         /// </summary>
+        [XmlAttribute("RowCount")]
         public int RowCount { get => this._cells.GetLength(1); }
 
         /// <summary>
@@ -110,24 +115,6 @@ namespace SpreadsheetEngine
             {
                 cell.Text = value;
             }
-        }
-
-        /// <summary>
-        /// Saves a spreadsheet
-        /// </summary>
-        /// <param name="stream">the stream to save to</param>
-        public void Save(Stream stream)
-        {
-
-        }
-
-        /// <summary>
-        /// Loads a spreadsheet
-        /// </summary>
-        /// <param name="stream">the stream to load from</param>
-        public void Load(Stream stream)
-        {
-
         }
 
         /// <summary>
