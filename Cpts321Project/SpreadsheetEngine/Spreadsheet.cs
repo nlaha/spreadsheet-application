@@ -113,6 +113,24 @@ namespace SpreadsheetEngine
         }
 
         /// <summary>
+        /// Saves a spreadsheet
+        /// </summary>
+        /// <param name="stream">the stream to save to</param>
+        public void Save(Stream stream)
+        {
+
+        }
+
+        /// <summary>
+        /// Loads a spreadsheet
+        /// </summary>
+        /// <param name="stream">the stream to load from</param>
+        public void Load(Stream stream)
+        {
+
+        }
+
+        /// <summary>
         /// Gets a cell by it's name, i.e A1 or B23
         /// </summary>
         /// <param name="cellName">the cell's name string</param>
