@@ -12,9 +12,19 @@ namespace SpreadsheetEngine.Commands
     public class CellChangeCommand : ICommand
     {
         /// <summary>
-        /// The target cell to modify
+        /// The spreadsheet class
         /// </summary>
-        private readonly Cell _target;
+        private readonly Spreadsheet _spreadsheet;
+
+        /// <summary>
+        /// The row index of the target cell
+        /// </summary>
+        private readonly int _rowIndex;
+
+        /// <summary>
+        /// the column index of the target cell
+        /// </summary>
+        private readonly int _columnIndex;
 
         /// <summary>
         /// The name of the property to change
@@ -34,12 +44,17 @@ namespace SpreadsheetEngine.Commands
         /// <summary>
         /// Initializes a new instance of the <see cref="CellChangeCommand"/> class.
         /// </summary>
-        /// <param name="target">the cell to register the command on</param>
+        /// <param name="spreadsheet">the spreadsheet to perform the command on</param>
+        /// <param name="rowIndex">the row index of the target cell</param>
+        /// <param name="columnIndex">the column index of the target cell</param>
         /// <param name="propertyName">the property to change</param>
         /// <param name="newValue">the new property value</param>
-        public CellChangeCommand(Cell target, string propertyName, object newValue)
+        public CellChangeCommand(Spreadsheet spreadsheet, int rowIndex, int columnIndex, string propertyName, object newValue)
         {
-            this._target = target;
+            this._spreadsheet = spreadsheet;
+            this._rowIndex = rowIndex;
+            this._columnIndex = columnIndex;
+
             this._propertyName = propertyName;
             this._newValue = newValue;
         }
@@ -47,15 +62,17 @@ namespace SpreadsheetEngine.Commands
         /// <inheritdoc/>
         public void Execute()
         {
+            var target = this._spreadsheet.GetCell(this._columnIndex, this._rowIndex);
+
             // use reflection to modify the property on the cell
-            PropertyInfo? property = this._target.GetType()?.GetProperty(this._propertyName);
+            PropertyInfo? property = target.GetType()?.GetProperty(this._propertyName);
             if (property == null)
             {
                 throw new ArgumentNullException(nameof(this._propertyName), "Property does not exist on the target object.");
             }
 
-            this._oldValue = property.GetValue(this._target);
-            property.SetValue(this._target, this._newValue);
+            this._oldValue = property.GetValue(target);
+            property.SetValue(target, this._newValue);
         }
 
         /// <inheritdoc/>
@@ -67,14 +84,17 @@ namespace SpreadsheetEngine.Commands
         /// <inheritdoc/>
         public void Undo()
         {
+            var target = this._spreadsheet.GetCell(this._columnIndex, this._rowIndex);
+
             // use reflection to revert the property value back to the old value
-            PropertyInfo? property = this._target.GetType()?.GetProperty(this._propertyName);
+            PropertyInfo? property = target.GetType()?.GetProperty(this._propertyName);
             if (property == null)
             {
                 throw new ArgumentNullException(nameof(this._propertyName), "Property does not exist on the target object.");
             }
 
-            property.SetValue(this._target, this._oldValue);
+            // TODO: cell is a difference object reference when it gets recreated by the spreadsheet for expressions
+            property.SetValue(target, this._oldValue);
         }
     }
 }

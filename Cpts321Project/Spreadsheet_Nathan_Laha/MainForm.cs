@@ -135,7 +135,7 @@ namespace Spreadsheet_Nathan_Laha
             // update cell text
             try
             {
-                var command = new CellChangeCommand(cell!, "Text", dataGridCell.Value?.ToString() ?? string.Empty);
+                var command = new CellChangeCommand(this._spreadsheet, cell.RowIndex, cell.ColumnIndex, "Text", dataGridCell.Value?.ToString() ?? string.Empty);
                 this.ExecuteCommand(command);
 
                 dataGridCell.ErrorText = string.Empty;
@@ -196,7 +196,7 @@ namespace Spreadsheet_Nathan_Laha
                 {
                     Cell cell = this._spreadsheet.GetCell(dataGridCell.ColumnIndex, dataGridCell.RowIndex);
 
-                    var command = new CellChangeCommand(cell, "BGColor", (uint)this.colorDialog.Color.ToArgb());
+                    var command = new CellChangeCommand(this._spreadsheet, cell.RowIndex, cell.ColumnIndex, "BGColor", (uint)this.colorDialog.Color.ToArgb());
                     this.ExecuteCommand(command);
                 }
             }

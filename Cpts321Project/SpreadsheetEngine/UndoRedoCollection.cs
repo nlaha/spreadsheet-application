@@ -11,6 +11,8 @@ namespace SpreadsheetEngine
     /// </summary>
     public class UndoRedoCollection
     {
+        private readonly Spreadsheet _spreadsheet;
+
         /// <summary>
         /// Undo command stack
         /// </summary>
@@ -20,6 +22,15 @@ namespace SpreadsheetEngine
         /// Redo command stack
         /// </summary>
         private readonly Stack<ICommand> _redoStack = new ();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UndoRedoCollection"/> class.
+        /// </summary>
+        /// <param name="spreadsheet">the spreadsheet</param>
+        public UndoRedoCollection(Spreadsheet spreadsheet)
+        {
+            this._spreadsheet = spreadsheet;
+        }
 
         /// <summary>
         /// The delegate for when there are new names for the undo/redo operations

@@ -28,7 +28,7 @@ namespace SpreadsheetEngine
         public Spreadsheet(int numColumns, int numRows)
         {
             this._cells = new Cell[numColumns, numRows];
-            this.UndoRedoCollection = new UndoRedoCollection();
+            this.UndoRedoCollection = new UndoRedoCollection(this);
 
             for (int y = 0; y < numRows; y++)
             {
