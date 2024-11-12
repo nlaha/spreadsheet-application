@@ -14,7 +14,7 @@ namespace SpreadsheetEngine.ExpressionTree
     /// Represents an expression tree that will be evaluated to
     /// numeric values
     /// </summary>
-    internal class ExpressionTree
+    public class ExpressionTree : IDisposable
     {
         /// <summary>
         /// The cell that this expression tree references, optional
@@ -25,11 +25,6 @@ namespace SpreadsheetEngine.ExpressionTree
         /// Set of cells this expression references
         /// </summary>
         private readonly HashSet<Cell> _referencedCells;
-
-        /// <summary>
-        /// The node factory instance used to create nodes
-        /// </summary>
-        private readonly NodeFactory _nodeFactory;
 
         /// <summary>
         /// The root node of the expression tree
@@ -46,7 +41,6 @@ namespace SpreadsheetEngine.ExpressionTree
         /// </summary>
         public ExpressionTree()
         {
-            this._nodeFactory = new NodeFactory();
             this._referencedCells = new HashSet<Cell>();
         }
 
@@ -56,7 +50,6 @@ namespace SpreadsheetEngine.ExpressionTree
         /// <param name="expression">the expression to generate the tree from</param>
         public ExpressionTree(string expression)
         {
-            this._nodeFactory = new NodeFactory();
             this._referencedCells = new HashSet<Cell>();
             this.ConstructTree(expression);
         }
@@ -70,16 +63,13 @@ namespace SpreadsheetEngine.ExpressionTree
         {
             // skipping the '=' character
             this._cell = cell;
-            this._nodeFactory = new NodeFactory();
             this._spreadsheet = spreadsheet;
             this._referencedCells = new HashSet<Cell>();
             this.ConstructTree(cell.Text[1..]);
         }
 
-        /// <summary>
-        /// Finalizes an instance of the <see cref="ExpressionTree"/> class.
-        /// </summary>
-        ~ExpressionTree()
+        /// <inheritdoc/>
+        public void Dispose()
         {
             // unsubscribe from events
             foreach (var cell in this._referencedCells)
@@ -259,7 +249,7 @@ namespace SpreadsheetEngine.ExpressionTree
 
                 // process and create nodes
                 Node node;
-                nextExpression = this._nodeFactory.CreateNode(this.GetVariableValue, nextExpression, out node);
+                nextExpression = NodeFactorySingleton.Instance.CreateNode(this.GetVariableValue, nextExpression, out node);
 
                 // process operators by precedence and associativity
                 if (node is NodeBinaryOperator op)

@@ -18,7 +18,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
         [Test]
         public void CellChangeCommand_ChangesProperty()
         {
-            var spreadsheet = new Spreadsheet(Constants.NUMCOLUMNS, Constants.NUMROWS);
+            var spreadsheet = new Spreadsheet();
             var cell = spreadsheet.GetCell(0, 0);
             var command = new CellChangeCommand(spreadsheet, cell.RowIndex, cell.ColumnIndex, "Text", "Hello World!");
 
@@ -33,7 +33,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
         [Test]
         public void CellChangeCommand_HandlesInvalidType()
         {
-            var spreadsheet = new Spreadsheet(Constants.NUMCOLUMNS, Constants.NUMROWS);
+            var spreadsheet = new Spreadsheet();
             var cell = spreadsheet.GetCell(0, 0);
             var command = new CellChangeCommand(spreadsheet, cell.RowIndex, cell.ColumnIndex, "Text", 123);
 

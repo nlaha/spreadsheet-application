@@ -142,7 +142,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
         public void ExpressionTree_TestVariableLookup()
         {
             // arrange
-            Spreadsheet spreadsheet = new Spreadsheet(50, 50);
+            Spreadsheet spreadsheet = new Spreadsheet();
             TextCell cell = new TextCell(0, 0, "=A3+A2+2");
 
             spreadsheet.SetCellValue(0, 2, "1");
@@ -163,7 +163,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
         public void ExpressionTree_ThrowsNonNumericVariable()
         {
             // arrange
-            Spreadsheet spreadsheet = new Spreadsheet(50, 50);
+            Spreadsheet spreadsheet = new Spreadsheet();
             TextCell cell = new TextCell(0, 0, "=A3+A2+2");
 
             spreadsheet.SetCellValue(0, 2, "hello");

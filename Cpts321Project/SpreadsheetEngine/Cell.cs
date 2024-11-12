@@ -11,7 +11,7 @@ namespace SpreadsheetEngine
     /// <summary>
     /// Represents a cell in the spreadsheet
     /// </summary>
-    public abstract class Cell : INotifyPropertyChanged
+    public class Cell : INotifyPropertyChanged
     {
         /// <summary>
         /// Protected field for the cell text
@@ -36,6 +36,11 @@ namespace SpreadsheetEngine
         protected uint _bgColor;
 
         /// <summary>
+        /// Optional expression tree for the cell
+        /// </summary>
+        private ExpressionTree.ExpressionTree? _expressionTree;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Cell"/> class.
         /// </summary>
         /// <param name="rowIndex">the row index of the cell</param>
@@ -47,6 +52,7 @@ namespace SpreadsheetEngine
             this._text = string.Empty;
             this._value = string.Empty;
             this._bgColor = 0xFFFFFFFF;
+            this._expressionTree = null;
         }
 
         /// <inheritdoc/>
@@ -77,6 +83,29 @@ namespace SpreadsheetEngine
         /// Gets the column index of the cell in the spreadsheet
         /// </summary>
         public int ColumnIndex { get; }
+
+        /// <summary>
+        /// Gets or sets the expression tree for the cell
+        /// </summary>
+        public ExpressionTree.ExpressionTree? ExpressionTree
+        {
+            get => this._expressionTree;
+            set
+            {
+                if (this._expressionTree != null)
+                {
+                    this._expressionTree.Dispose();
+                    this._expressionTree = null;
+                }
+
+                this._expressionTree = value;
+
+                if (this._expressionTree != null)
+                {
+                    this.Value = this._expressionTree.Evaluate().ToString();
+                }
+            }
+        }
 
         /// <summary>
         /// Gets or sets the text property of the cell

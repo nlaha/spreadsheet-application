@@ -29,7 +29,7 @@ namespace Spreadsheet_Nathan_Laha
         {
             this.InitializeComponent();
             this.InitializeDataGrid(this.dataGrid);
-            this._spreadsheet = new Spreadsheet(Constants.NUMCOLUMNS, Constants.NUMROWS);
+            this._spreadsheet = new Spreadsheet();
 
             this._spreadsheet.CellPropertyChanged += this.OnCellPropertyChanged;
 
@@ -91,20 +91,14 @@ namespace Spreadsheet_Nathan_Laha
             if (e.PropertyName == "BGColor")
             {
                 // update cell background color when it changes
-                dataGridCell.Style.BackColor = System.Drawing.Color.FromArgb((int)cell.BGColor);
+                var color = System.Drawing.Color.FromArgb((int)cell.BGColor);
+                dataGridCell.Style.BackColor = color;
             }
             else
             {
                 // we're not changing the background color so update the value
-                try
-                {
-                    dataGridCell.Value = cell.Value;
-                    dataGridCell.ErrorText = string.Empty;
-                }
-                catch (InvalidExpressionTreeException exception)
-                {
-                    dataGridCell.ErrorText = exception.Message;
-                }
+                dataGridCell.Value = cell.Value;
+                dataGridCell.ErrorText = string.Empty;
             }
         }
 
@@ -133,21 +127,14 @@ namespace Spreadsheet_Nathan_Laha
             var dataGridCell = this.GetDataGridCell(e.ColumnIndex, e.RowIndex);
 
             // update cell text
-            try
-            {
-                var command = new CellChangeCommand(this._spreadsheet, cell.RowIndex, cell.ColumnIndex, "Text", dataGridCell.Value?.ToString() ?? string.Empty);
-                this.ExecuteCommand(command);
+            var command = new CellChangeCommand(cell, "Text", dataGridCell.Value?.ToString() ?? string.Empty);
+            this.ExecuteCommand(command);
 
-                dataGridCell.ErrorText = string.Empty;
+            dataGridCell.ErrorText = string.Empty;
 
-                // force a property change event, this way if we don't change the text at all
-                // we still get back into value display mode
-                cell!.NotifyPropertyChanged();
-            }
-            catch (InvalidExpressionTreeException exception)
-            {
-                dataGridCell.ErrorText = exception.Message;
-            }
+            // force a property change event, this way if we don't change the text at all
+            // we still get back into value display mode
+            cell!.NotifyPropertyChanged();
         }
 
         /// <summary>
@@ -196,7 +183,7 @@ namespace Spreadsheet_Nathan_Laha
                 {
                     Cell cell = this._spreadsheet.GetCell(dataGridCell.ColumnIndex, dataGridCell.RowIndex);
 
-                    var command = new CellChangeCommand(this._spreadsheet, cell.RowIndex, cell.ColumnIndex, "BGColor", (uint)this.colorDialog.Color.ToArgb());
+                    var command = new CellChangeCommand(cell, "BGColor", (uint)this.colorDialog.Color.ToArgb());
                     this.ExecuteCommand(command);
                 }
             }
@@ -245,6 +232,58 @@ namespace Spreadsheet_Nathan_Laha
         private void RedoToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this._spreadsheet.UndoRedoCollection.Redo();
+        }
+
+        /// <summary>
+        /// Called when the save button is clicked
+        /// </summary>
+        /// <param name="sender">the sender</param>
+        /// <param name="e">the event args</param>
+        private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var result = this.saveFileDialog.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                FileStream fs = new FileStream(this.openFileDialog.FileName, FileMode.Create);
+                try
+                {
+                    SpreadsheetLoader.Save(fs, this._spreadsheet);
+                }
+                catch (IOException exception)
+                {
+                    MessageBox.Show(exception.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                finally
+                {
+                    fs.Close();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Called when the load button is clicked
+        /// </summary>
+        /// <param name="sender">the sender</param>
+        /// <param name="e">the event args</param>
+        private void LoadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var result = this.openFileDialog.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                FileStream fs = new FileStream(this.openFileDialog.FileName, FileMode.Open);
+                try
+                {
+                    this._spreadsheet = SpreadsheetLoader.Load(fs);
+                }
+                catch (IOException exception)
+                {
+                    MessageBox.Show(exception.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                finally
+                {
+                    fs.Close();
+                }
+            }
         }
     }
 }

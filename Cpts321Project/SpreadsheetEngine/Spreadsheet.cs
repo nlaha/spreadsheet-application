@@ -26,18 +26,16 @@ namespace SpreadsheetEngine
         /// <summary>
         /// Initializes a new instance of the <see cref="Spreadsheet"/> class.
         /// </summary>
-        /// <param name="numColumns">the number of columns</param>
-        /// <param name="numRows">the number of rows</param>
-        public Spreadsheet(int numColumns, int numRows)
+        public Spreadsheet()
         {
-            this._cells = new Cell[numColumns, numRows];
-            this.UndoRedoCollection = new UndoRedoCollection(this);
+            this.UndoRedoCollection = new UndoRedoCollection();
+            this._cells = new Cell[Constants.NUMCOLUMNS, Constants.NUMROWS];
 
-            for (int y = 0; y < numRows; y++)
+            for (int y = 0; y < Constants.NUMROWS; y++)
             {
-                for (int x = 0; x < numColumns; x++)
+                for (int x = 0; x < Constants.NUMCOLUMNS; x++)
                 {
-                    this._cells[x, y] = new TextCell(x, y, string.Empty);
+                    this._cells[x, y] = new Cell(x, y);
 
                     // subscribe to change events
                     this._cells[x, y].PropertyChanged += this.OnCellPropertyChanged;
@@ -164,23 +162,20 @@ namespace SpreadsheetEngine
                 // check if cell has a formula
                 if (cell.Text.StartsWith('='))
                 {
-                    // if so we need to recreate it as an ExpressionCell
-                    var newCell = new ExpressionCell(cell.ColumnIndex, cell.RowIndex, cell.Text, this);
-                    cell.PropertyChanged -= this.OnCellPropertyChanged;
-                    cell = newCell;
-                    cell.PropertyChanged += this.OnCellPropertyChanged;
+                    // recompute the formula
+                    try
+                    {
+                        cell.ExpressionTree = new ExpressionTree.ExpressionTree(cell, this);
+                    }
+                    catch (InvalidExpressionTreeException)
+                    {
+                        cell.Value = "ERR!";
+                    }
                 }
-                else if (cell is ExpressionCell)
+                else
                 {
-                    // otherwise, if it's an expression cell but doesn't start with a
-                    // '=' anymore, make it a text cell
-                    var newCell = new TextCell(cell.ColumnIndex, cell.RowIndex, cell.Text);
-                    cell.PropertyChanged -= this.OnCellPropertyChanged;
-                    cell = newCell;
-                    cell.PropertyChanged += this.OnCellPropertyChanged;
+                    cell.Value = cell.Text;
                 }
-
-                this._cells[cell.ColumnIndex, cell.RowIndex] = cell;
 
                 // invoke the property changed event
                 // this should trigger an update in the UI

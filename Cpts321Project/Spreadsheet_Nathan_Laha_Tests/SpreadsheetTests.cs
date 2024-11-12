@@ -16,7 +16,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
         /// <summary>
         /// main form class
         /// </summary>
-        private Spreadsheet _spreadsheet = new (Constants.NUMCOLUMNS, Constants.NUMROWS);
+        private Spreadsheet _spreadsheet = new ();
 
         /// <summary>
         /// Test to make sure spreadsheet is initialized
@@ -26,7 +26,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
         {
             // arrange
             // act
-            Spreadsheet spreadsheet = new Spreadsheet(Constants.NUMCOLUMNS, Constants.NUMROWS);
+            Spreadsheet spreadsheet = new Spreadsheet();
 
             // assert
             Assert.That(spreadsheet, Is.Not.Null);
@@ -40,7 +40,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
         public void Spreadsheet_ThrowsExceptionWhen_GetCell_OutOfRange()
         {
             // arrange
-            Spreadsheet spreadsheet = new Spreadsheet(Constants.NUMCOLUMNS, Constants.NUMROWS);
+            Spreadsheet spreadsheet = new Spreadsheet();
 
             // act & assert
             Assert.Throws<IndexOutOfRangeException>(() =>
@@ -73,7 +73,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
         public void Spreadsheet_Evaluate_BasicReferenceFormula()
         {
             // arrange
-            Spreadsheet spreadsheet = new Spreadsheet(Constants.NUMCOLUMNS, Constants.NUMROWS);
+            Spreadsheet spreadsheet = new Spreadsheet();
 
             // act
             spreadsheet.SetCellText(0, 0, "10");
@@ -90,7 +90,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
         public void Spreadsheet_GetCellByName()
         {
             // arrange
-            Spreadsheet spreadsheet = new Spreadsheet(Constants.NUMCOLUMNS, Constants.NUMROWS);
+            Spreadsheet spreadsheet = new Spreadsheet();
             spreadsheet.SetCellText(0, 0, "10");
             var name = "A1";
 
@@ -108,7 +108,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
         public void Spreadsheet_GetCellByName_ThrowsException()
         {
             // arrange
-            Spreadsheet spreadsheet = new Spreadsheet(Constants.NUMCOLUMNS, Constants.NUMROWS);
+            Spreadsheet spreadsheet = new Spreadsheet();
             var name = "Bad Name";
 
             // act & assert
