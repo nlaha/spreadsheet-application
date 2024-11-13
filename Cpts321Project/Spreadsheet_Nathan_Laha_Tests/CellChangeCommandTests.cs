@@ -20,7 +20,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
         {
             var spreadsheet = new Spreadsheet();
             var cell = spreadsheet.GetCell(0, 0);
-            var command = new CellChangeCommand(spreadsheet, cell.RowIndex, cell.ColumnIndex, "Text", "Hello World!");
+            var command = new CellChangeCommand(cell, "Text", "Hello World!");
 
             command.Execute();
 
@@ -35,7 +35,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
         {
             var spreadsheet = new Spreadsheet();
             var cell = spreadsheet.GetCell(0, 0);
-            var command = new CellChangeCommand(spreadsheet, cell.RowIndex, cell.ColumnIndex, "Text", 123);
+            var command = new CellChangeCommand(cell, "Text", 123);
 
             Assert.Throws<System.ArgumentException>(() => command.Execute());
         }

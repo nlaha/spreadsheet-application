@@ -29,7 +29,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
             var opInstance = Activator.CreateInstance(expectedType);
 
             // act
-            var nodeFactory = new NodeFactorySingleton();
+            var nodeFactory = NodeFactorySingleton.Instance;
             var node = nodeFactory.CreateBinaryOperator(op);
 
             // assert
@@ -56,7 +56,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
             // arrange
             // act
             var node = null as Node;
-            var nodeFactory = new NodeFactorySingleton();
+            var nodeFactory = NodeFactorySingleton.Instance;
             var str = nodeFactory.CreateNode((name) => { return 0.0; }, expression, out node);
 
             // assert
@@ -79,7 +79,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
             // act
             // assert
             var node = null as Node;
-            var nodeFactory = new NodeFactorySingleton();
+            var nodeFactory = NodeFactorySingleton.Instance;
             Assert.Throws<InvalidExpressionTreeException>(() =>
             {
                 nodeFactory.CreateNode((name) => { return 0.0; }, expression, out node);

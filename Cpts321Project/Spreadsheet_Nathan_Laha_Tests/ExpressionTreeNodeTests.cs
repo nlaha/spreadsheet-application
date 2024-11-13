@@ -19,7 +19,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
             // arrange
             var lhs = new NodeNumericConstant("10.0");
             var rhs = new NodeNumericConstant("5.0");
-            var nodeFactory = new NodeFactorySingleton();
+            var nodeFactory = NodeFactorySingleton.Instance;
             var node = nodeFactory.CreateBinaryOperator('+');
 
             // extra assert

@@ -15,7 +15,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
         /// <summary>
         /// Instance for reflection
         /// </summary>
-        private UndoRedoCollection _collection = new (new Spreadsheet());
+        private UndoRedoCollection _collection = new ();
 
         /// <summary>
         /// Tests the undo operation
@@ -25,9 +25,9 @@ namespace Spreadsheet_Nathan_Laha_Tests
         {
             // arrange
             var spreadsheet = new Spreadsheet();
-            this._collection = new (spreadsheet);
+            this._collection = new ();
             var cell = spreadsheet.GetCell(0, 0);
-            var command = new CellChangeCommand(spreadsheet, cell.RowIndex, cell.ColumnIndex, "Text", "Hello World!");
+            var command = new CellChangeCommand(cell, "Text", "Hello World!");
             command.Execute();
             this._collection.AddCommand(command);
 
@@ -52,10 +52,10 @@ namespace Spreadsheet_Nathan_Laha_Tests
         {
             // arrange
             var spreadsheet = new Spreadsheet();
-            this._collection = new (spreadsheet);
+            this._collection = new ();
             var cell = spreadsheet.GetCell(0, 0);
             cell.Text = string.Empty;
-            var command = new CellChangeCommand(spreadsheet, cell.RowIndex, cell.ColumnIndex, "Text", "Hello World!");
+            var command = new CellChangeCommand(cell, "Text", "Hello World!");
             command.Execute();
             this._collection.AddCommand(command);
             this._collection.Undo();
@@ -81,7 +81,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
         {
             // arrange
             var spreadsheet = new Spreadsheet();
-            this._collection = new (spreadsheet);
+            this._collection = new ();
 
             // act
             this._collection.Undo();

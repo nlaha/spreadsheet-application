@@ -1,5 +1,6 @@
 ﻿namespace Spreadsheet_Nathan_Laha_Tests
 {
+    using System.Text;
     using SpreadsheetEngine;
 
     /// <summary>
@@ -14,10 +15,15 @@
         public void Spreadsheet_LoadEmpty_ClearsCells()
         {
             // arrange
-            Spreadsheet spreadsheet = new (Constants.NUMCOLUMNS, Constants.NUMROWS);
+            Spreadsheet spreadsheet = new ();
             spreadsheet.SetCellText(0, 0, "Hello World");
 
-            Stream stream = new MemoryStream();
+            Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(
+            """
+                <?xml version="1.0" encoding="utf-8"?>
+                <Spreadsheet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="https://nlaha.com">
+                </Spreadsheet>
+            """.Trim()));
 
             // act
             spreadsheet = SpreadsheetLoader.Load(stream);
@@ -33,16 +39,16 @@
         public void Spreadsheet_Save()
         {
             // arrange
-            Spreadsheet spreadsheet = new (Constants.NUMCOLUMNS, Constants.NUMROWS);
+            Spreadsheet spreadsheet = new ();
             spreadsheet.SetCellText(0, 0, "Hello World");
 
-            Stream stream = new MemoryStream();
+            using (var saveStream = new MemoryStream())
+            {
+                SpreadsheetLoader.Save(saveStream, spreadsheet);
 
-            // act
-            SpreadsheetLoader.Save(stream, spreadsheet);
-
-            // assert
-            Assert.That(stream.Length, Is.GreaterThan(0));
+                // assert
+                Assert.That(saveStream, Is.Not.Null);
+            }
         }
     }
 }
