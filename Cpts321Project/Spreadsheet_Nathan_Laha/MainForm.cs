@@ -29,7 +29,28 @@ namespace Spreadsheet_Nathan_Laha
         {
             this.InitializeComponent();
             this.InitializeDataGrid(this.dataGrid);
+
             this._spreadsheet = new Spreadsheet();
+            this._spreadsheet.CellPropertyChanged += this.OnCellPropertyChanged;
+            this._spreadsheet.UndoRedoCollection.CurrentUndoRedoNamesChanged += this.UpdateUndoRedoNames;
+            this.UpdateUndoRedoNames(null, null);
+        }
+
+        /// <summary>
+        /// Double buffering for data grids
+        /// See: https://stackoverflow.com/a/44188565/24202835
+        /// Makes rendering much faster!
+        /// </summary>
+        /// <param name="ctl">The control</param>
+        /// <param name="doubleBuffered">True to make the control double buffered</param>
+        private static void SetDoubleBuffer(Control ctl, bool doubleBuffered)
+        {
+            typeof(Control).InvokeMember(
+                "DoubleBuffered",
+                BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty,
+                null,
+                ctl,
+                new object[] { doubleBuffered });
         }
 
         /// <summary>
@@ -57,23 +78,6 @@ namespace Spreadsheet_Nathan_Laha
         }
 
         /// <summary>
-        /// Double buffering for data grids
-        /// See: https://stackoverflow.com/a/44188565/24202835
-        /// Makes rendering much faster!
-        /// </summary>
-        /// <param name="ctl">The control</param>
-        /// <param name="doubleBuffered">True to make the control double buffered</param>
-        private static void SetDoubleBuffer(Control ctl, bool doubleBuffered)
-        {
-            typeof(Control).InvokeMember(
-                "DoubleBuffered",
-                BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty,
-                null,
-                ctl,
-                new object[] { doubleBuffered });
-        }
-
-        /// <summary>
         /// Gets a cell in the data grid
         /// </summary>
         /// <param name="columnIndex">the column index</param>
@@ -92,6 +96,21 @@ namespace Spreadsheet_Nathan_Laha
         }
 
         /// <summary>
+        /// Clears the data grid and reinitializes all cells
+        /// </summary>
+        private void ClearDataGrid()
+        {
+            // clear the data grid by constructing new cells
+            for (int c = 0; c < this.dataGrid.ColumnCount; c++)
+            {
+                for (int r = 0; r < this.dataGrid.RowCount; r++)
+                {
+                    this.dataGrid.Rows[r].Cells[c] = new DataGridViewTextBoxCell();
+                }
+            }
+        }
+
+        /// <summary>
         /// Called when something changes in a cell and we need to update it in the UI
         /// </summary>
         /// <param name="sender">the cell</param>
@@ -107,18 +126,13 @@ namespace Spreadsheet_Nathan_Laha
 
             var dataGridCell = this.GetDataGridCell(cell.ColumnIndex, cell.RowIndex);
 
-            if (e.PropertyName == "BGColor")
-            {
-                // update cell background color when it changes
-                var color = System.Drawing.Color.FromArgb((int)cell.BGColor);
-                dataGridCell.Style.BackColor = color;
-            }
-            else
-            {
-                // we're not changing the background color so update the value
-                dataGridCell.Value = cell.Value;
-                dataGridCell.ErrorText = string.Empty;
-            }
+            // we're not changing the background color so update the value
+            dataGridCell.Value = cell.Value;
+            dataGridCell.ErrorText = string.Empty;
+
+            // update cell background color when it changes
+            var color = System.Drawing.Color.FromArgb((int)cell.BGColor);
+            dataGridCell.Style.BackColor = color;
         }
 
         /// <summary>
@@ -289,6 +303,9 @@ namespace Spreadsheet_Nathan_Laha
             var result = this.openFileDialog.ShowDialog();
             if (result == DialogResult.OK)
             {
+                // clear the UI
+                this.ClearDataGrid();
+
                 FileStream fs = new FileStream(this.openFileDialog.FileName, FileMode.Open);
                 try
                 {
