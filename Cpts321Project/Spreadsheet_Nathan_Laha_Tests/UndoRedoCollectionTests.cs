@@ -24,8 +24,12 @@ namespace Spreadsheet_Nathan_Laha_Tests
         public void UndoRedoCollection_Undo_ModifiesStack()
         {
             // arrange
-            var cell = new TextCell(0, 0, string.Empty);
-            this._collection.AddCommand(new CellChangeCommand(cell, "Text", "Hello World!"));
+            var spreadsheet = new Spreadsheet();
+            this._collection = new ();
+            var cell = spreadsheet.GetCell(0, 0);
+            var command = new CellChangeCommand(cell, "Text", "Hello World!");
+            command.Execute();
+            this._collection.AddCommand(command);
 
             // act
             this._collection.Undo();
@@ -47,8 +51,13 @@ namespace Spreadsheet_Nathan_Laha_Tests
         public void UndoRedoCollection_Redo_ModifiesStack()
         {
             // arrange
-            var cell = new TextCell(0, 0, string.Empty);
-            this._collection.AddCommand(new CellChangeCommand(cell, "Text", "Hello World!"));
+            var spreadsheet = new Spreadsheet();
+            this._collection = new ();
+            var cell = spreadsheet.GetCell(0, 0);
+            cell.Text = string.Empty;
+            var command = new CellChangeCommand(cell, "Text", "Hello World!");
+            command.Execute();
+            this._collection.AddCommand(command);
             this._collection.Undo();
 
             // act
@@ -71,6 +80,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
         public void UndoRedoCollection_Undo_EmptyStack()
         {
             // arrange
+            var spreadsheet = new Spreadsheet();
             this._collection = new ();
 
             // act

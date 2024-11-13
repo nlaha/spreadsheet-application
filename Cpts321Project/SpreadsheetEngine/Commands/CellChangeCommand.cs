@@ -12,7 +12,7 @@ namespace SpreadsheetEngine.Commands
     public class CellChangeCommand : ICommand
     {
         /// <summary>
-        /// The target cell to modify
+        /// The target cell
         /// </summary>
         private readonly Cell _target;
 
@@ -34,12 +34,13 @@ namespace SpreadsheetEngine.Commands
         /// <summary>
         /// Initializes a new instance of the <see cref="CellChangeCommand"/> class.
         /// </summary>
-        /// <param name="target">the cell to register the command on</param>
+        /// <param name="target">the target cell</param>
         /// <param name="propertyName">the property to change</param>
         /// <param name="newValue">the new property value</param>
         public CellChangeCommand(Cell target, string propertyName, object newValue)
         {
             this._target = target;
+
             this._propertyName = propertyName;
             this._newValue = newValue;
         }
@@ -74,6 +75,7 @@ namespace SpreadsheetEngine.Commands
                 throw new ArgumentNullException(nameof(this._propertyName), "Property does not exist on the target object.");
             }
 
+            // TODO: cell is a difference object reference when it gets recreated by the spreadsheet for expressions
             property.SetValue(this._target, this._oldValue);
         }
     }

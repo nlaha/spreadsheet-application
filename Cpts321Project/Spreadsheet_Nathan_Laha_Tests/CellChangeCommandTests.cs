@@ -18,7 +18,8 @@ namespace Spreadsheet_Nathan_Laha_Tests
         [Test]
         public void CellChangeCommand_ChangesProperty()
         {
-            var cell = new TextCell(0, 0, string.Empty);
+            var spreadsheet = new Spreadsheet();
+            var cell = spreadsheet.GetCell(0, 0);
             var command = new CellChangeCommand(cell, "Text", "Hello World!");
 
             command.Execute();
@@ -32,8 +33,8 @@ namespace Spreadsheet_Nathan_Laha_Tests
         [Test]
         public void CellChangeCommand_HandlesInvalidType()
         {
-            var cell = new TextCell(0, 0, string.Empty);
-            var newCell = new TextCell(0, 0, "Hello World!");
+            var spreadsheet = new Spreadsheet();
+            var cell = spreadsheet.GetCell(0, 0);
             var command = new CellChangeCommand(cell, "Text", 123);
 
             Assert.Throws<System.ArgumentException>(() => command.Execute());

@@ -29,10 +29,9 @@ namespace Spreadsheet_Nathan_Laha
         {
             this.InitializeComponent();
             this.InitializeDataGrid(this.dataGrid);
-            this._spreadsheet = new Spreadsheet(Constants.NUMCOLUMNS, Constants.NUMROWS);
 
+            this._spreadsheet = new Spreadsheet();
             this._spreadsheet.CellPropertyChanged += this.OnCellPropertyChanged;
-
             this._spreadsheet.UndoRedoCollection.CurrentUndoRedoNamesChanged += this.UpdateUndoRedoNames;
             this.UpdateUndoRedoNames(null, null);
         }
@@ -55,6 +54,30 @@ namespace Spreadsheet_Nathan_Laha
         }
 
         /// <summary>
+        /// Sets a new spreadsheet and cleans up the old one
+        /// </summary>
+        /// <param name="spreadsheet">the new spreadsheet</param>
+        private void SetNewSpreadsheet(Spreadsheet spreadsheet)
+        {
+            // subscribe to events in the new spreadsheet
+            spreadsheet.CellPropertyChanged += this.OnCellPropertyChanged;
+            spreadsheet.UndoRedoCollection.CurrentUndoRedoNamesChanged += this.UpdateUndoRedoNames;
+
+            // now that we're subscribed, we can call the cell property changed method
+            // on each modified cell
+            foreach (Cell cell in spreadsheet.Cells)
+            {
+                cell.NotifyPropertyChanged();
+            }
+
+            // clean up the existing spreadsheet
+            this._spreadsheet.Dispose();
+
+            this._spreadsheet = spreadsheet;
+            this.UpdateUndoRedoNames(null, null);
+        }
+
+        /// <summary>
         /// Gets a cell in the data grid
         /// </summary>
         /// <param name="columnIndex">the column index</param>
@@ -73,6 +96,21 @@ namespace Spreadsheet_Nathan_Laha
         }
 
         /// <summary>
+        /// Clears the data grid and reinitializes all cells
+        /// </summary>
+        private void ClearDataGrid()
+        {
+            // clear the data grid by constructing new cells
+            for (int c = 0; c < this.dataGrid.ColumnCount; c++)
+            {
+                for (int r = 0; r < this.dataGrid.RowCount; r++)
+                {
+                    this.dataGrid.Rows[r].Cells[c] = new DataGridViewTextBoxCell();
+                }
+            }
+        }
+
+        /// <summary>
         /// Called when something changes in a cell and we need to update it in the UI
         /// </summary>
         /// <param name="sender">the cell</param>
@@ -88,24 +126,13 @@ namespace Spreadsheet_Nathan_Laha
 
             var dataGridCell = this.GetDataGridCell(cell.ColumnIndex, cell.RowIndex);
 
-            if (e.PropertyName == "BGColor")
-            {
-                // update cell background color when it changes
-                dataGridCell.Style.BackColor = System.Drawing.Color.FromArgb((int)cell.BGColor);
-            }
-            else
-            {
-                // we're not changing the background color so update the value
-                try
-                {
-                    dataGridCell.Value = cell.Value;
-                    dataGridCell.ErrorText = string.Empty;
-                }
-                catch (InvalidExpressionTreeException exception)
-                {
-                    dataGridCell.ErrorText = exception.Message;
-                }
-            }
+            // we're not changing the background color so update the value
+            dataGridCell.Value = cell.Value;
+            dataGridCell.ErrorText = string.Empty;
+
+            // update cell background color when it changes
+            var color = System.Drawing.Color.FromArgb((int)cell.BGColor);
+            dataGridCell.Style.BackColor = color;
         }
 
         /// <summary>
@@ -133,21 +160,14 @@ namespace Spreadsheet_Nathan_Laha
             var dataGridCell = this.GetDataGridCell(e.ColumnIndex, e.RowIndex);
 
             // update cell text
-            try
-            {
-                var command = new CellChangeCommand(cell!, "Text", dataGridCell.Value?.ToString() ?? string.Empty);
-                this.ExecuteCommand(command);
+            var command = new CellChangeCommand(cell, "Text", dataGridCell.Value?.ToString() ?? string.Empty);
+            this.ExecuteCommand(command);
 
-                dataGridCell.ErrorText = string.Empty;
+            dataGridCell.ErrorText = string.Empty;
 
-                // force a property change event, this way if we don't change the text at all
-                // we still get back into value display mode
-                cell!.NotifyPropertyChanged();
-            }
-            catch (InvalidExpressionTreeException exception)
-            {
-                dataGridCell.ErrorText = exception.Message;
-            }
+            // force a property change event, this way if we don't change the text at all
+            // we still get back into value display mode
+            cell!.NotifyPropertyChanged();
         }
 
         /// <summary>
@@ -245,6 +265,61 @@ namespace Spreadsheet_Nathan_Laha
         private void RedoToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this._spreadsheet.UndoRedoCollection.Redo();
+        }
+
+        /// <summary>
+        /// Called when the save button is clicked
+        /// </summary>
+        /// <param name="sender">the sender</param>
+        /// <param name="e">the event args</param>
+        private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var result = this.saveFileDialog.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                FileStream fs = new FileStream(this.saveFileDialog.FileName, FileMode.Create);
+                try
+                {
+                    SpreadsheetLoader.Save(fs, this._spreadsheet);
+                }
+                catch (IOException exception)
+                {
+                    MessageBox.Show(exception.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                finally
+                {
+                    fs.Close();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Called when the load button is clicked
+        /// </summary>
+        /// <param name="sender">the sender</param>
+        /// <param name="e">the event args</param>
+        private void LoadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var result = this.openFileDialog.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                // clear the UI
+                this.ClearDataGrid();
+
+                FileStream fs = new FileStream(this.openFileDialog.FileName, FileMode.Open);
+                try
+                {
+                    this.SetNewSpreadsheet(SpreadsheetLoader.Load(fs));
+                }
+                catch (IOException exception)
+                {
+                    MessageBox.Show(exception.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                finally
+                {
+                    fs.Close();
+                }
+            }
         }
     }
 }

@@ -5,11 +5,12 @@
 namespace SpreadsheetEngine
 {
     using SpreadsheetEngine.Commands;
+    using System.ComponentModel;
 
     /// <summary>
     /// Holds the undo and redo history for the spreadsheet
     /// </summary>
-    public class UndoRedoCollection
+    public class UndoRedoCollection : IDisposable
     {
         /// <summary>
         /// Undo command stack
@@ -78,6 +79,16 @@ namespace SpreadsheetEngine
             this._undoStack.Push(command);
 
             this.SendNewUndoRedoNames();
+        }
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            Delegate[] cellPropertySubscribers = this.CurrentUndoRedoNamesChanged?.GetInvocationList() ?? [];
+            foreach (Delegate subscriber in cellPropertySubscribers)
+            {
+                this.CurrentUndoRedoNamesChanged -= (UndoRedoNamesChangedEventHandler)subscriber;
+            }
         }
 
         /// <summary>

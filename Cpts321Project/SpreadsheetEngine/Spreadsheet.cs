@@ -6,6 +6,7 @@ namespace SpreadsheetEngine
 {
     using System.ComponentModel;
     using System.Text.RegularExpressions;
+    using System.Xml.Serialization;
     using SpreadsheetEngine.Commands;
     using SpreadsheetEngine.Exceptions;
     using SpreadsheetEngine.ExpressionTree;
@@ -13,28 +14,27 @@ namespace SpreadsheetEngine
     /// <summary>
     /// Represents a container of cells and the cell factory
     /// </summary>
-    public class Spreadsheet
+    [XmlRoot("Spreadsheet", Namespace = "https://nlaha.com", IsNullable = false)]
+    public class Spreadsheet : IDisposable
     {
         /// <summary>
         /// 2D array of cells in the spreadsheet
         /// </summary>
-        private readonly Cell[,] _cells;
+        private Cell[,] _cells;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Spreadsheet"/> class.
         /// </summary>
-        /// <param name="numColumns">the number of columns</param>
-        /// <param name="numRows">the number of rows</param>
-        public Spreadsheet(int numColumns, int numRows)
+        public Spreadsheet()
         {
-            this._cells = new Cell[numColumns, numRows];
             this.UndoRedoCollection = new UndoRedoCollection();
+            this._cells = new Cell[Constants.NUMCOLUMNS, Constants.NUMROWS];
 
-            for (int y = 0; y < numRows; y++)
+            for (int y = 0; y < Constants.NUMROWS; y++)
             {
-                for (int x = 0; x < numColumns; x++)
+                for (int x = 0; x < Constants.NUMCOLUMNS; x++)
                 {
-                    this._cells[x, y] = new TextCell(x, y, string.Empty);
+                    this._cells[x, y] = new Cell(x, y);
 
                     // subscribe to change events
                     this._cells[x, y].PropertyChanged += this.OnCellPropertyChanged;
@@ -50,16 +50,44 @@ namespace SpreadsheetEngine
         /// <summary>
         /// Gets the collection of undo/redo commands
         /// </summary>
+        [XmlIgnore]
         public UndoRedoCollection UndoRedoCollection { get; }
+
+        /// <summary>
+        /// Gets or sets the cells in the spreadsheet
+        /// The getter returns only the cells that were modified
+        /// </summary>
+        [XmlArray("Cells")]
+        public Cell[] Cells
+        {
+            get
+            {
+                // flatten the cells array from 2D to 1D as
+                // we can't
+                return this._cells.Cast<Cell>().Where(x => x.WasModified).ToArray();
+            }
+
+            set
+            {
+                foreach (Cell cell in value)
+                {
+                    cell.WasModified = true;
+                    cell.PropertyChanged += this.OnCellPropertyChanged;
+                    this._cells[cell.ColumnIndex, cell.RowIndex] = cell;
+                }
+            }
+        }
 
         /// <summary>
         /// Gets the number of columns
         /// </summary>
+        [XmlAttribute("ColumnCount")]
         public int ColumnCount { get => this._cells.GetLength(0); }
 
         /// <summary>
         /// Gets the number of rows
         /// </summary>
+        [XmlAttribute("RowCount")]
         public int RowCount { get => this._cells.GetLength(1); }
 
         /// <summary>
@@ -135,6 +163,19 @@ namespace SpreadsheetEngine
             return this.GetCell(this.ColumnToIndex(cellName[0]), rowIdx - 1);
         }
 
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            // unsubscribe all subscribers
+            Delegate[] cellPropertySubscribers = this.CellPropertyChanged?.GetInvocationList() ?? [];
+            foreach (Delegate subscriber in cellPropertySubscribers)
+            {
+                this.CellPropertyChanged -= (PropertyChangedEventHandler)subscriber;
+            }
+
+            this.UndoRedoCollection.Dispose();
+        }
+
         /// <summary>
         /// Gets a column index from a column character, i.e. 'A' -> 0
         /// </summary>
@@ -159,23 +200,20 @@ namespace SpreadsheetEngine
                 // check if cell has a formula
                 if (cell.Text.StartsWith('='))
                 {
-                    // if so we need to recreate it as an ExpressionCell
-                    var newCell = new ExpressionCell(cell.ColumnIndex, cell.RowIndex, cell.Text, this);
-                    cell.PropertyChanged -= this.OnCellPropertyChanged;
-                    cell = newCell;
-                    cell.PropertyChanged += this.OnCellPropertyChanged;
+                    // recompute the formula
+                    try
+                    {
+                        cell.ExpressionTree = new ExpressionTree.ExpressionTree(cell, this);
+                    }
+                    catch (InvalidExpressionTreeException)
+                    {
+                        cell.Value = "ERR!";
+                    }
                 }
-                else if (cell is ExpressionCell)
+                else
                 {
-                    // otherwise, if it's an expression cell but doesn't start with a
-                    // '=' anymore, make it a text cell
-                    var newCell = new TextCell(cell.ColumnIndex, cell.RowIndex, cell.Text);
-                    cell.PropertyChanged -= this.OnCellPropertyChanged;
-                    cell = newCell;
-                    cell.PropertyChanged += this.OnCellPropertyChanged;
+                    cell.Value = cell.Text;
                 }
-
-                this._cells[cell.ColumnIndex, cell.RowIndex] = cell;
 
                 // invoke the property changed event
                 // this should trigger an update in the UI

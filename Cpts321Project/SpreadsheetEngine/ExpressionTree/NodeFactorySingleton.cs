@@ -1,4 +1,4 @@
-﻿// <copyright file="NodeFactory.cs" company="Nathan Laha">
+﻿// <copyright file="NodeFactorySingleton.cs" company="Nathan Laha">
 // 11762135
 // </copyright>
 
@@ -13,18 +13,28 @@ namespace SpreadsheetEngine.ExpressionTree
     /// <summary>
     /// Constructs operators
     /// </summary>
-    internal class NodeFactory
+    internal class NodeFactorySingleton
     {
+        /// <summary>
+        /// The mutex for thread safety
+        /// </summary>
+        private static readonly object _padlock = new object();
+
+        /// <summary>
+        /// The singleton instance
+        /// </summary>
+        private static NodeFactorySingleton? _instance = null;
+
         /// <summary>
         /// Internal dictionary of operators and their types, populated
         /// when the node factory is constructed
         /// </summary>
-        private Dictionary<char, Type> _operators;
+        private readonly Dictionary<char, Type> _operators;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="NodeFactory"/> class.
+        /// Initializes a new instance of the <see cref="NodeFactorySingleton"/> class.
         /// </summary>
-        public NodeFactory()
+        private NodeFactorySingleton()
         {
             this._operators = new Dictionary<char, Type>();
 
@@ -38,6 +48,25 @@ namespace SpreadsheetEngine.ExpressionTree
         /// <param name="op">the operator character</param>
         /// <param name="type">the operator type</param>
         private delegate void OnOperator(char op, Type type);
+
+        /// <summary>
+        /// Gets the singleton instance of the node factory
+        /// </summary>
+        public static NodeFactorySingleton Instance
+        {
+            get
+            {
+                lock (NodeFactorySingleton._padlock)
+                {
+                    if (NodeFactorySingleton._instance == null)
+                    {
+                        NodeFactorySingleton._instance = new NodeFactorySingleton();
+                    }
+
+                    return NodeFactorySingleton._instance;
+                }
+            }
+        }
 
         /// <summary>
         /// Creates a binary operator node based on the operator character
@@ -55,7 +84,7 @@ namespace SpreadsheetEngine.ExpressionTree
                 }
             }
 
-            throw new InvalidOperatorException($"Operator \"{op}\" is not supported");
+            throw new InvalidExpressionTreeException($"Operator \"{op}\" is not supported");
         }
 
         /// <summary>
@@ -67,39 +96,34 @@ namespace SpreadsheetEngine.ExpressionTree
         /// <returns>the expression minus the tokens used to create the node</returns>
         public string CreateNode(Func<string, double> variableGetter, string expression, out Node node)
         {
-            // make operator node
-            try
+            // make variable node
+            var variableMatch = Regex.Match(expression, NodeVariable.NodeRegex);
+            if (variableMatch.Success)
             {
-                var op = this.CreateBinaryOperator(expression.FirstOrDefault());
-                if (op is not null)
-                {
-                    node = op;
+                node = new NodeVariable(variableGetter, variableMatch.Value);
 
-                    // skip the operator character
-                    return expression[1..];
-                }
+                // skip the variable name
+                return expression[variableMatch.Length..];
             }
-            catch (InvalidOperatorException)
+
+            // make numeric constant node
+            var numericMatch = Regex.Match(expression, NodeNumericConstant.NodeRegex);
+            if (numericMatch.Success)
             {
-                // make variable node
-                var variableMatch = Regex.Match(expression, NodeVariable.NodeRegex);
-                if (variableMatch.Success)
-                {
-                    node = new NodeVariable(variableGetter, variableMatch.Value);
+                node = new NodeNumericConstant(numericMatch.Value);
 
-                    // skip the variable name
-                    return expression[variableMatch.Length..];
-                }
+                // skip the numeric constant
+                return expression[numericMatch.Length..];
+            }
 
-                // make numeric constant node
-                var numericMatch = Regex.Match(expression, NodeNumericConstant.NodeRegex);
-                if (numericMatch.Success)
-                {
-                    node = new NodeNumericConstant(numericMatch.Value);
+            // make operator node
+            var op = this.CreateBinaryOperator(expression.FirstOrDefault());
+            if (op is not null)
+            {
+                node = op;
 
-                    // skip the numeric constant
-                    return expression[numericMatch.Length..];
-                }
+                // skip the operator character
+                return expression[1..];
             }
 
             throw new InvalidExpressionTreeException($"Expression contains invalid syntax");
