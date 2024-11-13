@@ -15,13 +15,12 @@ namespace SpreadsheetEngine
     /// Represents a container of cells and the cell factory
     /// </summary>
     [XmlRoot("Spreadsheet", Namespace = "https://nlaha.com", IsNullable = false)]
-    public class Spreadsheet
+    public class Spreadsheet : IDisposable
     {
         /// <summary>
         /// 2D array of cells in the spreadsheet
         /// </summary>
-        [XmlArray("Cells")]
-        private readonly Cell[,] _cells;
+        private Cell[,] _cells;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Spreadsheet"/> class.
@@ -51,7 +50,33 @@ namespace SpreadsheetEngine
         /// <summary>
         /// Gets the collection of undo/redo commands
         /// </summary>
+        [XmlIgnore]
         public UndoRedoCollection UndoRedoCollection { get; }
+
+        /// <summary>
+        /// Gets or sets the cells in the spreadsheet
+        /// The getter returns only the cells that were modified
+        /// </summary>
+        [XmlArray("Cells")]
+        public Cell[] Cells
+        {
+            get
+            {
+                // flatten the cells array from 2D to 1D as
+                // we can't
+                return this._cells.Cast<Cell>().Where(x => x.WasModified).ToArray();
+            }
+
+            set
+            {
+                foreach (Cell cell in value)
+                {
+                    cell.WasModified = true;
+                    cell.PropertyChanged += this.OnCellPropertyChanged;
+                    this._cells[cell.ColumnIndex, cell.RowIndex] = cell;
+                }
+            }
+        }
 
         /// <summary>
         /// Gets the number of columns
@@ -136,6 +161,19 @@ namespace SpreadsheetEngine
 
             // get cell
             return this.GetCell(this.ColumnToIndex(cellName[0]), rowIdx - 1);
+        }
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            // unsubscribe all subscribers
+            Delegate[] cellPropertySubscribers = this.CellPropertyChanged?.GetInvocationList() ?? [];
+            foreach (Delegate subscriber in cellPropertySubscribers)
+            {
+                this.CellPropertyChanged -= (PropertyChangedEventHandler)subscriber;
+            }
+
+            this.UndoRedoCollection.Dispose();
         }
 
         /// <summary>

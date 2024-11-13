@@ -75,14 +75,14 @@
             // saveToolStripMenuItem
             // 
             saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            saveToolStripMenuItem.Size = new Size(180, 22);
+            saveToolStripMenuItem.Size = new Size(100, 22);
             saveToolStripMenuItem.Text = "Save";
             saveToolStripMenuItem.Click += SaveToolStripMenuItem_Click;
             // 
             // loadToolStripMenuItem
             // 
             loadToolStripMenuItem.Name = "loadToolStripMenuItem";
-            loadToolStripMenuItem.Size = new Size(180, 22);
+            loadToolStripMenuItem.Size = new Size(100, 22);
             loadToolStripMenuItem.Text = "Load";
             loadToolStripMenuItem.Click += LoadToolStripMenuItem_Click;
             // 
@@ -124,6 +124,11 @@
             // openFileDialog
             // 
             openFileDialog.FileName = "openFileDialog";
+            openFileDialog.Filter = "XML files (*.xml)|*.xml|All files (*.*)|*.*";
+            // 
+            // saveFileDialog
+            // 
+            saveFileDialog.Filter = "XML files (*.xml)|*.xml|All files (*.*)|*.*";
             // 
             // MainForm
             // 

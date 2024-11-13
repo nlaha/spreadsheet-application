@@ -16,29 +16,39 @@ namespace SpreadsheetEngine
         /// <summary>
         /// Protected field for the cell text
         /// </summary>
-        [XmlAttribute("Text")]
-        [DefaultValueAttribute("")]
         protected string _text;
 
         /// <summary>
         /// Protected field for the cell value
         /// </summary>
-        [XmlAttribute("Value")]
-        [DefaultValueAttribute("")]
         protected string _value;
 
         /// <summary>
         /// Protected field for the background color of the cell
         /// in RGBA notation
         /// </summary>
-        [XmlAttribute("BGColor")]
-        [DefaultValueAttribute(0xFFFFFFFF)]
         protected uint _bgColor;
 
         /// <summary>
         /// Optional expression tree for the cell
         /// </summary>
         private ExpressionTree.ExpressionTree? _expressionTree;
+
+        /// <summary>
+        /// Private field indicating whether the cell was modified
+        /// </summary>
+        private bool _wasModified;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Cell"/> class.
+        /// </summary>
+        public Cell()
+        {
+            this._text = string.Empty;
+            this._value = string.Empty;
+            this._bgColor = 0xFFFFFFFF;
+            this._expressionTree = null;
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Cell"/> class.
@@ -61,6 +71,7 @@ namespace SpreadsheetEngine
         /// <summary>
         /// Gets or sets the background color of the cell in RGBA notation
         /// </summary>
+        [XmlAttribute]
         public uint BGColor
         {
             get => this._bgColor;
@@ -75,18 +86,31 @@ namespace SpreadsheetEngine
         }
 
         /// <summary>
-        /// Gets the row index of the cell in the spreadsheet
+        /// Gets or sets a value indicating whether the cell was modified in any way
         /// </summary>
-        public int RowIndex { get; }
+        [XmlIgnore]
+        public bool WasModified
+        {
+            get => this._wasModified;
+            set => this._wasModified = value;
+        }
 
         /// <summary>
-        /// Gets the column index of the cell in the spreadsheet
+        /// Gets or sets the row index of the cell in the spreadsheet
         /// </summary>
-        public int ColumnIndex { get; }
+        [XmlAttribute]
+        public int RowIndex { get; set; }
+
+        /// <summary>
+        /// Gets or sets the column index of the cell in the spreadsheet
+        /// </summary>
+        [XmlAttribute]
+        public int ColumnIndex { get; set; }
 
         /// <summary>
         /// Gets or sets the expression tree for the cell
         /// </summary>
+        [XmlIgnore]
         public ExpressionTree.ExpressionTree? ExpressionTree
         {
             get => this._expressionTree;
@@ -110,6 +134,7 @@ namespace SpreadsheetEngine
         /// <summary>
         /// Gets or sets the text property of the cell
         /// </summary>
+        [XmlElement("Text")]
         public string Text
         {
             get => this._text;
@@ -126,10 +151,11 @@ namespace SpreadsheetEngine
         /// <summary>
         /// Gets or sets the computed value of the cell
         /// </summary>
+        [XmlElement("Value")]
         public virtual string Value
         {
             get => this._value;
-            protected internal set
+            set
             {
                 this._value = value;
             }
@@ -141,6 +167,7 @@ namespace SpreadsheetEngine
         /// <param name="propertyName">an optional property name</param>
         public void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
+            this._wasModified = true;
             if (this.PropertyChanged != null)
             {
                 this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));

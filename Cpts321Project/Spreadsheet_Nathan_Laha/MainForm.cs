@@ -30,10 +30,29 @@ namespace Spreadsheet_Nathan_Laha
             this.InitializeComponent();
             this.InitializeDataGrid(this.dataGrid);
             this._spreadsheet = new Spreadsheet();
+        }
 
-            this._spreadsheet.CellPropertyChanged += this.OnCellPropertyChanged;
+        /// <summary>
+        /// Sets a new spreadsheet and cleans up the old one
+        /// </summary>
+        /// <param name="spreadsheet">the new spreadsheet</param>
+        private void SetNewSpreadsheet(Spreadsheet spreadsheet)
+        {
+            // subscribe to events in the new spreadsheet
+            spreadsheet.CellPropertyChanged += this.OnCellPropertyChanged;
+            spreadsheet.UndoRedoCollection.CurrentUndoRedoNamesChanged += this.UpdateUndoRedoNames;
 
-            this._spreadsheet.UndoRedoCollection.CurrentUndoRedoNamesChanged += this.UpdateUndoRedoNames;
+            // now that we're subscribed, we can call the cell property changed method
+            // on each modified cell
+            foreach (Cell cell in spreadsheet.Cells)
+            {
+                cell.NotifyPropertyChanged();
+            }
+
+            // clean up the existing spreadsheet
+            this._spreadsheet.Dispose();
+
+            this._spreadsheet = spreadsheet;
             this.UpdateUndoRedoNames(null, null);
         }
 
@@ -244,7 +263,7 @@ namespace Spreadsheet_Nathan_Laha
             var result = this.saveFileDialog.ShowDialog();
             if (result == DialogResult.OK)
             {
-                FileStream fs = new FileStream(this.openFileDialog.FileName, FileMode.Create);
+                FileStream fs = new FileStream(this.saveFileDialog.FileName, FileMode.Create);
                 try
                 {
                     SpreadsheetLoader.Save(fs, this._spreadsheet);
@@ -273,7 +292,7 @@ namespace Spreadsheet_Nathan_Laha
                 FileStream fs = new FileStream(this.openFileDialog.FileName, FileMode.Open);
                 try
                 {
-                    this._spreadsheet = SpreadsheetLoader.Load(fs);
+                    this.SetNewSpreadsheet(SpreadsheetLoader.Load(fs));
                 }
                 catch (IOException exception)
                 {

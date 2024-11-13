@@ -28,7 +28,7 @@ namespace SpreadsheetEngine
         /// Loads a spreadsheet
         /// </summary>
         /// <param name="stream">the stream to load from</param>
-        /// <returns>the spreadsheet object</returns>
+        /// <returns>the loaded spreadsheet</returns>
         public static Spreadsheet Load(Stream stream)
         {
             XmlSerializer serializer = new XmlSerializer(typeof(Spreadsheet));
