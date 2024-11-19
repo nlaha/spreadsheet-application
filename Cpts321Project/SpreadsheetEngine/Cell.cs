@@ -30,6 +30,11 @@ namespace SpreadsheetEngine
         protected uint _bgColor;
 
         /// <summary>
+        /// Set of cells this expression references
+        /// </summary>
+        private readonly HashSet<Cell> _referencedCells;
+
+        /// <summary>
         /// Optional expression tree for the cell
         /// </summary>
         private ExpressionTree.ExpressionTree? _expressionTree;
@@ -48,6 +53,7 @@ namespace SpreadsheetEngine
             this._value = string.Empty;
             this._bgColor = 0xFFFFFFFF;
             this._expressionTree = null;
+            this._referencedCells = new HashSet<Cell>();
         }
 
         /// <summary>
@@ -63,10 +69,26 @@ namespace SpreadsheetEngine
             this._value = string.Empty;
             this._bgColor = 0xFFFFFFFF;
             this._expressionTree = null;
+            this._referencedCells = new HashSet<Cell>();
         }
 
         /// <inheritdoc/>
         public event PropertyChangedEventHandler? PropertyChanged;
+
+        /// <summary>
+        /// Gets or sets error text to display error messages in the UI
+        /// </summary>
+        [XmlIgnore]
+        public string ErrorText { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets the set of cells this cell references
+        /// </summary>
+        [XmlIgnore]
+        public HashSet<Cell> ReferencedCells
+        {
+            get => this._referencedCells;
+        }
 
         /// <summary>
         /// Gets or sets the background color of the cell in RGBA notation
@@ -122,6 +144,17 @@ namespace SpreadsheetEngine
                     this._expressionTree = null;
                 }
 
+                // re-evaluate referenced cells before clearing
+                var references = new HashSet<Cell>(this.ReferencedCells);
+                this.ReferencedCells.Clear();
+                foreach (Cell cell in references)
+                {
+                    if (cell.ExpressionTree != null)
+                    {
+                        cell.NotifyPropertyChanged();
+                    }
+                }
+
                 this._expressionTree = value;
 
                 if (this._expressionTree != null)
@@ -172,6 +205,35 @@ namespace SpreadsheetEngine
             {
                 this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
+        }
+
+        /// <summary>
+        /// Recursively checks if this cell or any of its referenced cells
+        /// have references to the specified cell
+        /// </summary>
+        /// <param name="cell">the cell to check references to</param>
+        /// <returns>true if theres a circular reference</returns>
+        public bool HasCircularReference(Cell cell)
+        {
+            if (cell == this)
+            {
+                return true;
+            }
+
+            foreach (Cell referencedCell in this._referencedCells)
+            {
+                if (referencedCell == cell)
+                {
+                    return true;
+                }
+
+                if (referencedCell.HasCircularReference(cell))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

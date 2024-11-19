@@ -145,6 +145,31 @@ namespace Spreadsheet_Nathan_Laha_Tests
         }
 
         /// <summary>
+        /// Test the self-references
+        /// </summary>
+        [Test]
+        public void Spreadsheet_Errors_SelfRefrenceFormulaComplex3()
+        {
+            // arrange
+            Spreadsheet spreadsheet = new Spreadsheet();
+
+            spreadsheet.GetCell(0, 0).Value = "12";
+            spreadsheet.GetCell(0, 1).Value = "34";
+
+            // act
+            spreadsheet.SetCellText(0, 0, "=A2");
+            spreadsheet.SetCellText(0, 1, "=B1");
+            spreadsheet.SetCellText(1, 0, "=A1");
+
+            Assert.That(spreadsheet.GetCell(1, 0).ErrorText, Is.EqualTo("Circular reference detected"));
+
+            spreadsheet.SetCellText(0, 0, "123");
+
+            // assert
+            Assert.That(spreadsheet.GetCell(1, 0).ErrorText, Is.EqualTo(string.Empty));
+        }
+
+        /// <summary>
         /// Test getting a cell by it's name i.e. 'A0'
         /// </summary>
         [Test]

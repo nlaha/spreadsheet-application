@@ -204,15 +204,19 @@ namespace SpreadsheetEngine
                     try
                     {
                         cell.ExpressionTree = new ExpressionTree.ExpressionTree(cell, this);
+                        cell.ErrorText = string.Empty;
                     }
-                    catch (InvalidExpressionTreeException)
+                    catch (InvalidExpressionTreeException ex)
                     {
+                        cell.ErrorText = ex.Message;
                         cell.Value = "ERR!";
                     }
                 }
                 else
                 {
                     cell.Value = cell.Text;
+                    cell.ErrorText = string.Empty;
+                    cell.ExpressionTree = null;
                 }
 
                 // invoke the property changed event

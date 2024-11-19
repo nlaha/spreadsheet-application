@@ -128,7 +128,7 @@ namespace Spreadsheet_Nathan_Laha
 
             // we're not changing the background color so update the value
             dataGridCell.Value = cell.Value;
-            dataGridCell.ErrorText = string.Empty;
+            dataGridCell.ErrorText = cell.ErrorText;
 
             // update cell background color when it changes
             var color = System.Drawing.Color.FromArgb((int)cell.BGColor);
