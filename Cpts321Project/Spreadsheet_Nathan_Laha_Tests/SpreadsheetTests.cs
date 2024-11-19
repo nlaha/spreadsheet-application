@@ -7,6 +7,7 @@ namespace Spreadsheet_Nathan_Laha_Tests
     using System.Reflection;
     using Spreadsheet_Nathan_Laha;
     using SpreadsheetEngine;
+    using SpreadsheetEngine.Exceptions;
 
     /// <summary>
     /// Tests for the spreadsheet class
@@ -81,6 +82,66 @@ namespace Spreadsheet_Nathan_Laha_Tests
 
             // assert
             Assert.That(spreadsheet.GetCell(0, 1).Value, Is.EqualTo("10"));
+        }
+
+        /// <summary>
+        /// Test the self-references
+        /// </summary>
+        [Test]
+        public void Spreadsheet_Errors_SelfRefrenceFormula()
+        {
+            // arrange
+            Spreadsheet spreadsheet = new Spreadsheet();
+
+            // act
+            spreadsheet.SetCellText(0, 0, "=A1");
+
+            // assert
+            Assert.That(spreadsheet.GetCell(0, 0).ErrorText, Is.EqualTo("Circular reference detected"));
+        }
+
+        /// <summary>
+        /// Test the self-references
+        /// </summary>
+        [Test]
+        public void Spreadsheet_Errors_SelfRefrenceFormulaComplex()
+        {
+            // arrange
+            Spreadsheet spreadsheet = new Spreadsheet();
+
+            spreadsheet.GetCell(0, 0).Value = "12";
+            spreadsheet.GetCell(0, 1).Value = "34";
+
+            // act
+            spreadsheet.SetCellText(0, 1, "=A1");
+            spreadsheet.SetCellText(0, 0, "=A2");
+
+            // assert
+            Assert.That(spreadsheet.GetCell(0, 0).ErrorText, Is.EqualTo("Circular reference detected"));
+        }
+
+        /// <summary>
+        /// Test the self-references
+        /// </summary>
+        [Test]
+        public void Spreadsheet_Errors_SelfRefrenceFormulaComplex2()
+        {
+            // arrange
+            Spreadsheet spreadsheet = new Spreadsheet();
+
+            spreadsheet.GetCell(0, 0).Value = "12";
+            spreadsheet.GetCell(0, 1).Value = "34";
+
+            // act
+            spreadsheet.SetCellText(0, 0, "=A2");
+            spreadsheet.SetCellText(0, 1, "=A1");
+
+            Assert.That(spreadsheet.GetCell(0, 1).ErrorText, Is.EqualTo("Circular reference detected"));
+
+            spreadsheet.SetCellText(0, 0, "123");
+
+            // assert
+            Assert.That(spreadsheet.GetCell(0, 1).ErrorText, Is.EqualTo(string.Empty));
         }
 
         /// <summary>
