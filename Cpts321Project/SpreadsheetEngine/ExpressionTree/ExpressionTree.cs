@@ -17,14 +17,9 @@ namespace SpreadsheetEngine.ExpressionTree
     public class ExpressionTree : IDisposable
     {
         /// <summary>
-        /// The cell that this expression tree references, optional
+        /// The cell that this expression tree references
         /// </summary>
         private readonly Cell? _cell;
-
-        /// <summary>
-        /// Set of cells this expression references
-        /// </summary>
-        private readonly HashSet<Cell> _referencedCells;
 
         /// <summary>
         /// The root node of the expression tree
@@ -41,7 +36,6 @@ namespace SpreadsheetEngine.ExpressionTree
         /// </summary>
         public ExpressionTree()
         {
-            this._referencedCells = new HashSet<Cell>();
         }
 
         /// <summary>
@@ -50,7 +44,6 @@ namespace SpreadsheetEngine.ExpressionTree
         /// <param name="expression">the expression to generate the tree from</param>
         public ExpressionTree(string expression)
         {
-            this._referencedCells = new HashSet<Cell>();
             this.ConstructTree(expression);
         }
 
@@ -64,7 +57,6 @@ namespace SpreadsheetEngine.ExpressionTree
             // skipping the '=' character
             this._cell = cell;
             this._spreadsheet = spreadsheet;
-            this._referencedCells = new HashSet<Cell>();
             this.ConstructTree(cell.Text[1..]);
         }
 
@@ -72,9 +64,12 @@ namespace SpreadsheetEngine.ExpressionTree
         public void Dispose()
         {
             // unsubscribe from events
-            foreach (var cell in this._referencedCells)
+            if (this._cell != null)
             {
-                cell.PropertyChanged -= this.OnReferencedCellPropertyChanged;
+                foreach (var cell in this._cell.ReferencedCells)
+                {
+                    cell.PropertyChanged -= this.OnReferencedCellPropertyChanged;
+                }
             }
         }
 
@@ -110,12 +105,25 @@ namespace SpreadsheetEngine.ExpressionTree
                     throw new InvalidExpressionTreeException($"Referenced variable: \"{variableName}\" cannot be found!");
                 }
 
-                this._referencedCells.Add(cell);
+                if (this._cell != null)
+                {
+                    if (cell.HasCircularReference(this._cell))
+                    {
+                        throw new InvalidExpressionTreeException("Circular reference detected");
+                    }
+
+                    this._cell.ReferencedCells.Add(cell);
+                }
 
                 // When any of the referenced cells change, we want to re-evaluate the expression
                 // when we set the evaluated value back to the cell, it will trigger the cell's property changed event
                 // and will update the UI
                 cell.PropertyChanged += this.OnReferencedCellPropertyChanged;
+
+                if (string.IsNullOrWhiteSpace(cell.Value))
+                {
+                    return 0;
+                }
 
                 double value;
                 var success = double.TryParse(cell.Value, out value);
@@ -139,8 +147,14 @@ namespace SpreadsheetEngine.ExpressionTree
         /// <param name="e">the event args</param>
         private void OnReferencedCellPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (this._cell != null)
+            if (this._cell != null && sender != null)
             {
+                // if it's got a circular reference, stop the chain
+                if (((Cell)sender).ErrorText == "Circular reference detected")
+                {
+                    return;
+                }
+
                 this._cell.NotifyPropertyChanged();
             }
         }
